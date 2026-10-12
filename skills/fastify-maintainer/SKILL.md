@@ -1,13 +1,13 @@
 ---
 name: fastify-maintainer
-description: Use when maintaining repositories in the Fastify GitHub organization—including reviewing pull requests, implementing features, or fixing bugs in Fastify core, official fastify.dev/ecosystem plugins, or active Fastify libraries (such as avvio, fastify-plugin, light-my-request, middie, under-pressure, point-of-view, fast-json-stringify, fast-uri). Do not use for building end-user Fastify web applications.
+description: Use when maintaining repositories in the Fastify GitHub organization—reviewing pull requests, implementing features, or fixing bugs in Fastify core, official fastify.dev/ecosystem plugins, or active Fastify libraries (including repos without fastify in the name such as avvio, middie, under-pressure, point-of-view, light-my-request, fast-json-stringify, fast-uri, otel, session, sse). Do not use for building end-user Fastify applications, publishing releases, or repository administration.
 ---
 
 # Fastify Maintainer
 
 Use this skill when acting as a maintainer on a repository in the [Fastify GitHub organization](https://github.com/fastify) to **review a pull request / diff** or **implement a feature or bug fix**.
 
-Do **not** activate this skill for general user projects that merely consume Fastify as an application dependency.
+Do **not** activate this skill for general user projects that merely consume Fastify as an application dependency, or for package publishing, release tagging, and repository administration.
 
 ## Step 1: Discover Repository Scope, Policies, and Tooling
 

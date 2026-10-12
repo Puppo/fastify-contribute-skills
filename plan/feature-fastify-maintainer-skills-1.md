@@ -2,15 +2,15 @@
 goal: Build portable maintainer skills for reviewing and changing repositories across the Fastify organization
 version: 1
 date_created: 2026-10-09
-last_updated: 2026-10-11
+last_updated: 2026-10-12
 owner: Fastify maintainers
-status: In Progress
+status: Completed
 tags: [skills, fastify, review, implementation, testing]
 ---
 
 # Introduction
 
-![Status: In Progress](https://img.shields.io/badge/status-In%20Progress-yellow)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 Build a repository-aware maintainer skill that helps review pull requests, implement features, and fix bugs across actively maintained repositories in the [fastify](https://github.com/fastify) GitHub organization. Portable `SKILL.md` support for multiple coding agents is a confirmed requirement.
 
@@ -20,7 +20,7 @@ The in-scope repositories within `https://github.com/fastify` are strictly bound
 
 Start with one installable `fastify-maintainer` skill containing review and implementation workflows. Keep detailed guidance in focused references loaded only when relevant. Split into independently installable skills later only if evaluation demonstrates that separate entry points improve task selection or outcomes.
 
-Phases 1–3 (repository inventory, evaluation case design, entry-point skill, review/implementation workflows, and all 8 code-area references) are implemented in this workspace; Phases 4–5 (isolated behavioral evaluation and multi-agent pilot) remain next.
+All five implementation phases (`TASK-001` through `TASK-016`) are completed and validated in this repository.
 
 ## 1. Requirements & Constraints
 
@@ -102,9 +102,9 @@ Dependencies: Phase 3.
 
 | Task | Description | Completed | Date |
 | --- | --- | --- | --- |
-| TASK-012 | Validate skill metadata, reference resolution, and absence of unfinished scaffolding. Run the cases from TASK-003 in isolated copies at pinned revisions, both with and without the skill under equivalent conditions. Store patch/output, command results, and observed outcomes under `evals/results/`; exclude generated results from distributable skill content. | No | — |
-| TASK-013 | Compare outputs for defect detection, false positives, fix correctness, regression strength, applicability decisions, scope control, and verification honesty. Present raw outputs and a concise report to maintainers for feedback; revise only for demonstrated weaknesses. | No | — |
-| TASK-014 | Add `evals/fastify-maintainer/triggers.json` covering intended tasks across active Fastify repository types and near misses such as building a new Fastify application, working on unmanned/archived plugins, reviewing unrelated JavaScript, and performing releases. Include active in-scope repositories whose names do not contain Fastify (e.g., `avvio`, `middie`, `under-pressure`, `point-of-view`). Recheck description selection after revisions. | No | — |
+| TASK-012 | Validate skill metadata, reference resolution, and absence of unfinished scaffolding. Run the cases from TASK-003 in isolated copies at pinned revisions, both with and without the skill under equivalent conditions. Store patch/output, command results, and observed outcomes under `evals/results/`; exclude generated results from distributable skill content. | Yes | 2026-10-12 |
+| TASK-013 | Compare outputs for defect detection, false positives, fix correctness, regression strength, applicability decisions, scope control, and verification honesty. Present raw outputs and a concise report to maintainers for feedback; revise only for demonstrated weaknesses. | Yes | 2026-10-12 |
+| TASK-014 | Add `evals/fastify-maintainer/triggers.json` covering intended tasks across active Fastify repository types and near misses such as building a new Fastify application, working on unmanned/archived plugins, reviewing unrelated JavaScript, and performing releases. Include active in-scope repositories whose names do not contain Fastify (e.g., `avvio`, `middie`, `under-pressure`, `point-of-view`). Recheck description selection after revisions. | Yes | 2026-10-12 |
 
 Completion: all required outcomes in the curated cases pass; known review defects are found; clean controls produce no invented blocking findings; no invented commands or false test-pass claims occur. Record unresolved cases instead of claiming universal validation.
 
@@ -116,8 +116,8 @@ Dependencies: Phase 4.
 
 | Task | Description | Completed | Date |
 | --- | --- | --- | --- |
-| TASK-015 | Test isolated installation, reference loading, and representative review/implementation tasks in at least two available coding-agent environments. Update the repository `README.md` with purpose, scope rules (`fastify.dev/ecosystem` plugins + 2-year commit activity), companion skill recommendation (`npx skills add tstyche/tstyche-skills` from `https://tstyche.org/guides/agent-skills`), layout, tested agent versions and installation instructions, invocation examples, contribution workflow, and validation limits. Keep optional agent-specific metadata separate from the portable instructions; record unavailable environments as unvalidated. | No | — |
-| TASK-016 | Pilot on maintainer-selected real tasks spanning core (`fastify/fastify`), an official ecosystem plugin, a shared core library/tool, a type-provider repository, and a docs/workflow repository within the active Fastify set. Record feedback, agent environments, and tested revisions in `evals/pilot.md`; rerun affected cases after fixes. | No | — |
+| TASK-015 | Test isolated installation, reference loading, and representative review/implementation tasks in at least two available coding-agent environments. Update the repository `README.md` with purpose, scope rules (`fastify.dev/ecosystem` plugins + 2-year commit activity), companion skill recommendation (`npx skills add tstyche/tstyche-skills` from `https://tstyche.org/guides/agent-skills`), layout, tested agent versions and installation instructions, invocation examples, contribution workflow, and validation limits. Keep optional agent-specific metadata separate from the portable instructions; record unavailable environments as unvalidated. | Yes | 2026-10-12 |
+| TASK-016 | Pilot on maintainer-selected real tasks spanning core (`fastify/fastify`), an official ecosystem plugin, a shared core library/tool, a type-provider repository, and a docs/workflow repository within the active Fastify set. Record feedback, agent environments, and tested revisions in `evals/pilot.md`; rerun affected cases after fixes. | Yes | 2026-10-12 |
 
 Completion: isolated installations in at least two agent environments resolve every reference and complete representative review/implementation tasks without this repository's evaluation files or globally installed companion skills. The pilot covers the selected active Fastify repository categories; limitations and excluded unmanned/inactive repositories are documented.
 
