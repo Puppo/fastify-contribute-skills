@@ -1,0 +1,84 @@
+---
+name: fastify-code-review
+description: Use when reviewing a pull request, branch diff, or patch across any Fastify organization repository (fastify/fastify, @fastify/* plugins and utilities, fastify/workflows, or fastify/website). Standardizes the read-only code review flow, technical & governance checklists, evidence-backed finding classification, GitHub suggestion blocks, and the welcoming, concise Fastify maintainer tone on every PR. Pairs automatically with fastify-core, fastify-plugins, fastify-workflows, or fastify-website.
+---
+
+# Fastify Code Review Skill (`fastify-code-review`)
+
+Use this skill whenever reviewing a pull request, commit range, or branch diff in any [Fastify](https://github.com/fastify) repository. It enforces a **consistent review flow**, **consistent technical rigor**, and **consistent Fastify maintainer tone** across every PR.
+
+## Core Principles
+
+1. **Strictly Read-Only During Review:**
+   - Never edit, stage, or commit tracked repository files when asked to review a PR or diff.
+   - You may run read-only inspection commands (`git diff`, `git log`, `gh pr view`, `gh pr diff`) and non-mutating validation scripts (`npm run lint`, `npm run unit`, `npm run test:unit`, `npm run test:typescript`, `npm run check`).
+2. **Pair with the Matching Repository Skill:**
+   - Always combine this skill with the domain skill for the target repository so technical checks match local conventions:
+     - `fastify/fastify` -> load [`fastify-core`](../fastify-core/SKILL.md)
+     - `@fastify/*` plugins & `fastify/skeleton` repos -> load [`fastify-plugins`](../fastify-plugins/SKILL.md)
+     - `fastify/workflows` -> load [`fastify-workflows`](../fastify-workflows/SKILL.md)
+     - `fastify/website` -> load [`fastify-website`](../fastify-website/SKILL.md)
+3. **Evidence Over Invention:**
+   - Every finding must cite an exact `file:line` in the diff and explain the concrete bug, regression, type mismatch, security risk, or documented rule violation.
+   - If a PR is clean, say **`LGTM`** clearly. Never manufacture artificial nitpicks to appear thorough.
+4. **No Linter Duplication:**
+   - Never leave manual comments on indentation, semicolons, quotes, or import ordering that `neostandard` (`eslint`) or `biome` automatically checks—simply report whether `npm run lint` passes or fails.
+5. **Fastify Maintainer Tone:**
+   - Be welcoming, direct, collaborative, and concise (*"Thanks for the PR!"*, *"Good catch!"*, *"Can we add a regression test for this edge case?"*).
+   - Provide concrete GitHub ````suggestion` blocks whenever a fix can be expressed in a few lines.
+
+---
+
+## The Standardized 6-Step PR Review Flow
+
+Follow these 6 steps in order on every PR:
+
+### Step 1: Identify Repository & Load Companion Skill
+- Inspect `package.json` (and `.github/workflows/`) to identify the repository archetype.
+- Load the corresponding repository skill ([`fastify-core`](../fastify-core/SKILL.md), [`fastify-plugins`](../fastify-plugins/SKILL.md), [`fastify-workflows`](../fastify-workflows/SKILL.md), or [`fastify-website`](../fastify-website/SKILL.md)).
+
+### Step 2: Check PR Metadata, Title & Governance
+Read [references/review-flow-and-checklists.md](references/review-flow-and-checklists.md) and verify:
+- **PR Title**: Must follow Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `perf:`, `ci:`, `refactor:`, `build:`) as enforced by `fastify/action-pr-title`.
+- **No Version Bump**: `package.json#version` must **not** be modified in a PR (`CONTRIBUTING.md`: releases are cut separately by maintainers).
+- **Artifact & Lockfile Hygiene**:
+  - No `package-lock.json` committed in plugin repos where `.npmrc` sets `package-lock=false`.
+  - No git-ignored generated data (`src/content/docs/`, `src/data/*.json`) committed in `fastify/website`.
+  - In `fastify/fastify`, if `build/build-validation.js` or `build/build-error-serializer.js` changed, verify `lib/config-validator.js` or `lib/error-serializer.js` was regenerated cleanly.
+- **Target Branch & Semver Scope**: Check whether breaking changes are targeting the right branch (`main` vs `next` or maintenance branches `4.x`/`5.x`).
+
+### Step 3: Audit the Diff Across All Affected Areas
+Inspect the full diff (`gh pr diff` or `git diff <base>...HEAD`) against the domain rules in the companion skill:
+- **Runtime & Architecture**: Encapsulation (`fastify-plugin`), hook lifecycle, `@fastify/error` (`FST_ERR_*`), V8 monomorphic shapes (`Request`/`Reply` in core), security boundaries (prototype poisoning, header/path injection, XSS sanitization in website), and resource cleanup (`onClose`).
+- **TypeScript & `.d.ts` Sync**: Every new/changed public option, decorator, hook, or return type in `.js` must be reflected in `index.d.ts` / `types/index.d.ts` / `fastify.d.ts`.
+- **Tests & Type Tests**:
+  - Bug fixes **must** include a regression test that fails without the fix.
+  - Features **must** include runtime unit/integration tests (maintaining `100%` coverage where enforced by `c8 --100` or `borp --check-coverage`) and TSTyche type tests (`*.tst.ts` / `*.test-d.ts`).
+  - Verify tests use `fastify.inject()` by default, or `fastify.listen({ port: 0 })` + `t.after(() => fastify.close())` when testing real sockets.
+- **Docs & Workflows**: Verify `README.md` / `docs/` updates match runtime and type changes, error/warning codes are documented, and any `.github/workflows/` changes pin actions to 40-char commit SHAs.
+
+### Step 4: Run Local Verification (Read-Only)
+- Run the repository's lint, typecheck, and test scripts when dependencies are available locally.
+- Record the exact commands executed and their exit status. If a check cannot run locally (e.g., missing Docker service or unbuilt dependencies), state that explicitly rather than guessing.
+
+### Step 5: Classify Findings by Severity
+Group findings strictly into three levels (or zero findings if clean):
+- **`[Blocking]`**: Bugs, regressions, missing regression/unit/type tests, broken `.d.ts` contracts, security issues, unintended breaking changes, or failing CI/lint/coverage gates.
+- **`[Suggestion]`**: Concrete improvements to performance, readability, test assertions, or idiomatic Fastify patterns that do not block correctness (include a ````suggestion` block).
+- **`[Question]`**: Clarifying questions about design intent, edge cases, or semver expectations.
+
+### Step 6: Produce the Standardized Review Output
+Read [references/tone-and-templates.md](references/tone-and-templates.md) and format the response using the canonical 4-part Fastify review template:
+1. **Verdict & Executive Summary** (`Approve (LGTM)` | `Request Changes` | `Comment`)
+2. **Inline Review Comments** (ordered by severity, with `file:line` and ````suggestion` blocks)
+3. **Verification & Area Matrix** (table of checked areas and commands run)
+4. **Ready-to-Post GitHub Review** (top-level summary + copy-pasteable inline comments in the Fastify maintainer voice).
+
+---
+
+## Reference Navigation
+
+| Reference File | When to Read |
+|----------------|--------------|
+| [references/review-flow-and-checklists.md](references/review-flow-and-checklists.md) | Always read during Steps 2–4 for git/gh inspection commands, governance checks, and repo-specific technical checklists. |
+| [references/tone-and-templates.md](references/tone-and-templates.md) | Always read during Steps 5–6 for the Fastify maintainer tone guide, output template, ````suggestion` formatting, and canonical response examples. |

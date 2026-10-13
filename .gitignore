@@ -1,4 +1,5 @@
 node_modules/
-evals/results/
 .agent/
+.agents/
+.claude/
 .DS_Store
