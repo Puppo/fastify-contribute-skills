@@ -2,11 +2,13 @@
 
 Load this reference when writing, reviewing, or debugging unit tests, coverage checks, or integration tests (`test/**/*.test.js`) in a Fastify plugin repository.
 
+For standalone utilities, use the existing runner and exercise exported functions/classes directly. The request, registration, and teardown examples below apply only when the package's behavior involves Fastify. Runtime changes need relevant tests; type-only and documentation changes need validation appropriate to their scope.
+
 ---
 
 ## 1. Test Runners & 100% Coverage Enforcement
 
-Active Fastify plugins use Node's built-in test runner (`node:test`) with **100% coverage enforcement** via either `c8` or `borp`:
+Common plugin setups use Node's built-in test runner (`node:test`) with coverage gates via `c8` or `borp`. Confirm the actual runner, metrics, and thresholds in the checkout:
 
 1. **`c8 --100 node --test` (Most Common):**
    - Used in `@fastify/cookie`, `@fastify/multipart`, `@fastify/cors`, `@fastify/jwt`, `@fastify/rate-limit`, `@fastify/redis`, `@fastify/postgres`, `@fastify/swagger`, `@fastify/bearer-auth`, `@fastify/helmet`, `@fastify/websocket`, `@fastify/session`, `@fastify/sse`, `@fastify/otel`, `@fastify/csrf-protection`, `fastify-plugin`.
@@ -26,7 +28,7 @@ Active Fastify plugins use Node's built-in test runner (`node:test`) with **100%
      npx borp -p test/my-feature.test.js
      ```
 
-> **100% Coverage Rule:** Because `--100` / `--check-coverage --lines 100` fails CI if a single line, branch, or function is uncovered, every new option, fallback default, or error branch in `index.js` / `lib/` must have a corresponding test case. Avoid adding unreachable defensive branches unless tested.
+> **Coverage Evidence:** Preserve the configured thresholds and cover changed behavior, including errors and defaults. A `--lines 100` gate establishes a line threshold; do not infer 100% branch/function thresholds from it. Report the actual coverage command and metrics separately from ordinary unit-test success.
 
 ---
 

@@ -2,13 +2,15 @@
 
 Load this reference when configuring, reviewing, or updating `.github/workflows/*.yml`, `.github/dependabot.yml`, or release settings in a Fastify plugin repository.
 
+These examples describe repositories using the shared Fastify workflows. Confirm the target checkout's workflows, scripts, and release policy before applying them, including for standalone utilities. Preserve an existing release process unless changing it is part of the task; do not treat differences from a template as policy violations.
+
 > **Note:** This reference covers how **plugin repositories** configure their caller workflows and releases. If you are editing the reusable workflow definitions inside the [`fastify/workflows`](https://github.com/fastify/workflows) repository itself, use the [`fastify-workflows`](../../fastify-workflows/SKILL.md) skill instead.
 
 ---
 
 ## 1. Plugin Workflow Standard (`fastify/workflows` Callers)
 
-Fastify plugin repositories do **not** define inline multi-step CI or release pipelines unless they have specialized build requirements. Instead, every plugin repository contains thin caller workflows in `.github/workflows/` that delegate to [`fastify/workflows`](https://github.com/fastify/workflows), pinned to a **full 40-character commit SHA** with a version comment:
+Repositories using [`fastify/workflows`](https://github.com/fastify/workflows) commonly keep thin callers in `.github/workflows/`, pinned to a **full 40-character commit SHA** with a version comment. Inspect specialized build steps and existing caller contracts before changing them:
 
 1. `.github/workflows/ci.yml` — Continuous integration (`plugins-ci.yml` or a `plugins-ci-<service>.yml` variant).
 2. `.github/workflows/release.yml` — Manual `workflow_dispatch` release (`reusable-release.yml`).
@@ -73,7 +75,7 @@ When a plugin tests against an external backing service, use the matching reusab
 | **Elasticsearch** (`@fastify/elasticsearch`) | `fastify/workflows/.github/workflows/plugins-ci-elasticsearch.yml@<sha>` | `elasticsearch-version` (default `'9.3.0'`) |
 
 ### C. Key `with:` Options for Plugin CI
-- `lint: true` — Runs `npm run lint` (`eslint` with `neostandard`) in the `quality-check` job. Always enable this in active plugins.
+- `lint: true` — Runs `npm run lint` in the `quality-check` job. Confirm the caller defines that script and preserve its existing lint gate.
 - `license-check: true` — Verifies that all production dependencies use permissive SPDX licenses (`0BSD`, `Apache-2.0`, `BlueOak-1.0.0`, `BSD-2-Clause`, `BSD-3-Clause`, `ISC`, `MIT`).
 - `license-check-allowed-additional: 'Apache*'` — Semicolon-separated list of additional allowed SPDX license patterns when needed by a production dependency.
 - `fastify-dependency-integration: true` — Clones `fastify/fastify`, links the plugin via `npm link`, and runs Fastify core's `npm run unit` suite. Enable for plugins that Fastify core itself depends on (`fastify-plugin`, `@fastify/error`, `@fastify/ajv-compiler`, `light-my-request`).
@@ -85,7 +87,7 @@ When a plugin tests against an external backing service, use the matching reusab
 ## 3. Plugin Releases (`.github/workflows/release.yml` & Trusted Publishing)
 
 ### A. Standard `.github/workflows/release.yml`
-All official Fastify plugins use `fastify/workflows/.github/workflows/reusable-release.yml` for releases:
+For a repository using `fastify/workflows/.github/workflows/reusable-release.yml`, the caller follows this pattern:
 
 ```yaml
 name: Release the package
@@ -193,7 +195,7 @@ jobs:
 
 ## 5. `.github/dependabot.yml` Standard for Plugins
 
-Every Fastify plugin repository uses this Dependabot configuration (7-day cooldown, `chore` commit prefix, `increase-if-necessary` versioning strategy, and grouped ESLint/TypeScript devDependencies):
+This example uses a 7-day cooldown, `chore` commit prefix, `increase-if-necessary` versioning strategy, and grouped ESLint/TypeScript devDependencies. Match the target repository's dependencies and update policy rather than copying unrelated groups or exclusions:
 
 ```yaml
 version: 2

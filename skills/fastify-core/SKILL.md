@@ -19,9 +19,10 @@ Use this skill when reviewing a pull request, implementing a feature, or fixing 
 
 1. **Branch & Version Line Check:**
    - Inspect `git branch --show-current` and `package.json#version` (`main` / `next` vs maintenance branches `5.x`, `4.x`, etc.).
-   - Never bump `package.json#version` in a pull request (`CONTRIBUTING.md`: declaring formal releases is restricted to lead maintainers).
+   - Read the target branch's contribution and release rules. Ordinary feature/bug-fix PRs should not bump versions where releases are reserved for maintainers; documented maintainer release changes follow their release process.
    - **Human-Opened PR Policy (`CONTRIBUTING.md`):** Pull requests in `fastify/fastify` **must** be opened by a human. Prepare verified local patches, conventional PR titles (`pull-request-title.yml`), and review summaries for the human maintainer.
 2. **Core Command Reference (`package.json#scripts`):**
+   - Confirm these scripts and their bodies in the target checkout before running them. During review, follow `fastify-code-review` revision matching and isolation rules; generators must run only in a temporary checkout.
    - **Unit tests:** `npm run unit` (`borp`)
    - **Single unit test file:** `npx borp -p test/<file>.test.js`
    - **100% coverage gate (CI):** `npm run coverage:ci-check-coverage` (`borp --coverage --check-coverage --lines 100`)
@@ -86,6 +87,6 @@ Load the reference file(s) matching the area of `fastify/fastify` affected by yo
 
 ## Core Non-Negotiable Checklist Before Completing Any Task
 
-1. **Generated Files Integrity:** If you touch `build/build-validation.js` or `build/build-error-serializer.js`, run `npm run build:validation` and `npm run test:validator:integrity`. Never edit `lib/config-validator.js` or `lib/error-serializer.js` by hand.
-2. **Runtime + `types/*.d.ts` + `test/types/*.tst.ts` + `docs/Reference/*.md` Lockstep:** Any change to server options, route options, hooks, `Request`, `Reply`, or `FST_ERR_*` codes must update `fastify.d.ts` / `types/*.d.ts`, `test/types/*.tst.ts`, and `docs/Reference/` in the same patch.
-3. **100% Coverage & Linter Cleanliness:** Run `npx borp -p <test-file>`, `npx tstyche <type-test-file>`, `npm run lint`, and `npm run lint:markdown` (when `.md` files change).
+1. **Generated Files Integrity:** For generator changes, confirm `build:validation` and `test:validator:integrity` in the checkout and regenerate during implementation. During review, verify committed output only in an isolated checkout. Never edit generated validators by hand; core's `build/` source scripts and generated files in `lib/` are intentionally tracked.
+2. **Public Contracts:** When public options, hooks, request/reply APIs, or error codes change, update the affected declarations, type tests, and reference docs. Test internal behavioral fixes without requiring unrelated public API edits.
+3. **Tests, Coverage & Lint:** Run relevant runtime/type tests and linters using the checkout's scripts. Run the configured coverage gate separately for runtime changes; focused test success alone does not establish coverage. Report unavailable checks as `Not run` with the reason.

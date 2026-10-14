@@ -2,6 +2,8 @@
 
 Load this reference when authoring, updating, or reviewing `types/index.d.ts`, `types/*.tst.ts` (or `*.test-d.ts`), or TypeScript sources in a Fastify plugin repository.
 
+The declaration template below is for CommonJS registered plugins. Utilities should retain declarations for their own functions/classes and supported exports; do not add Fastify augmentation or plugin options to unrelated APIs. Use the repository's existing type-test runner and add tests when public types or their runtime contract change.
+
 ---
 
 ## 1. Canonical `types/index.d.ts` Pattern for Fastify Plugins
@@ -9,7 +11,7 @@ Load this reference when authoring, updating, or reviewing `types/index.d.ts`, `
 Almost all `@fastify/*` plugins are written in CommonJS JavaScript (`index.js`) with hand-maintained TypeScript declarations in `types/index.d.ts` (`"types": "types/index.d.ts"` in `package.json`).
 
 ### Standard `types/index.d.ts` Template
-Every plugin `types/index.d.ts` must:
+For a CommonJS plugin exposing the demonstrated import styles:
 1. Import `FastifyPluginCallback` (for callback plugins) or `FastifyPluginAsync` (for async plugins) from `'fastify'`.
 2. Use `declare module 'fastify'` to augment `FastifyInstance`, `FastifyRequest`, `FastifyReply`, or `FastifyContextConfig` with any decorators or route config added by the plugin.
 3. Declare a namespace (`declare namespace fastifyMyPlugin`) exporting the options interface, any helper types/constants, the named export `export const fastifyMyPlugin: FastifyMyPlugin`, and `export { fastifyMyPlugin as default }`.
@@ -82,7 +84,7 @@ For TypeScript-authored plugins/type providers like `@fastify/type-provider-type
 
 ## 3. Type Testing with TSTyche (`types/*.tst.ts`)
 
-All active Fastify plugins use **[TSTyche](https://tstyche.org/)** (`"test:typescript": "tstyche"` in `package.json`) with type test files placed in `types/index.tst.ts` (and optional focused files like `types/named-import.tst.ts`, `types/imports.tst.ts`, `types/namespace.tst.ts`).
+Many plugins use **[TSTyche](https://tstyche.org/)** (`"test:typescript": "tstyche"` in `package.json`) with files such as `types/index.tst.ts`. Confirm the configured runner and discovery rules; changing runners is not required for an ordinary fix.
 
 > **Companion Skills ([TSTyche Agent Skills](https://tstyche.org/guides/agent-skills)):**
 > Check if `tstyche-type-tests`, `tstyche-project-setup`, or `tstyche-migrate-from-tsd` from [`tstyche/tstyche-skills`](https://github.com/tstyche/tstyche-skills) are installed in the agent environment. If installed, load them for complex TSTyche tasks; otherwise follow the built-in rules below.
@@ -114,18 +116,26 @@ const app: FastifyInstance = fastify()
 app.register(myPluginNamed)
 app.register(myPluginDefault)
 app.register(fastifyMyPluginCjs)
+app.register(fastifyMyPluginCjsImport)
 app.register(fastifyMyPluginCjsImport.default)
 app.register(fastifyMyPluginCjsImport.fastifyMyPlugin)
 app.register(fastifyMyPluginStar.default)
 app.register(fastifyMyPluginStar.fastifyMyPlugin)
 
-expect(myPluginNamed).type.toBe<fastifyMyPluginStar.FastifyMyPlugin>()
-expect(myPluginDefault).type.toBe<fastifyMyPluginStar.FastifyMyPlugin>()
-expect(fastifyMyPluginCjsImport.default).type.toBe<fastifyMyPluginStar.FastifyMyPlugin>()
-expect(fastifyMyPluginCjsImport.fastifyMyPlugin).type.toBe<fastifyMyPluginStar.FastifyMyPlugin>()
-expect(fastifyMyPluginStar.default).type.toBe<fastifyMyPluginStar.FastifyMyPlugin>()
-expect(fastifyMyPluginStar.fastifyMyPlugin).type.toBe<fastifyMyPluginStar.FastifyMyPlugin>()
+// Compare the call signature; the root export also carries namespace properties.
+type PluginCallback = (
+  ...args: Parameters<typeof fastifyMyPluginCjsImport>
+) => ReturnType<typeof fastifyMyPluginCjsImport>
+
+expect(myPluginNamed).type.toBe<PluginCallback>()
+expect(myPluginDefault).type.toBe<PluginCallback>()
+expect(fastifyMyPluginCjsImport.default).type.toBe<PluginCallback>()
+expect(fastifyMyPluginCjsImport.fastifyMyPlugin).type.toBe<PluginCallback>()
+expect(fastifyMyPluginStar.default).type.toBe<PluginCallback>()
+expect(fastifyMyPluginStar.fastifyMyPlugin).type.toBe<PluginCallback>()
 ```
+
+The declaration's `FastifyMyPlugin` alias is private. Derive this single-signature callback type from `typeof fastifyMyPluginCjsImport` instead of referencing a nonexistent namespace export. Raw `require()` is untyped here; the `import = require()` checks provide the CJS declaration evidence. For overloaded/generic APIs, test the supported calls and inference directly rather than flattening their signatures. See the [TSTyche assertion API](https://tstyche.org/reference/expect-api) for identity and ability matchers.
 
 ### 3. Writing Positive and Negative TSTyche Assertions
 Use `expect(expression).type.*` from `'tstyche'` to test plugin options, augmented decorators on `fastify`/`request`/`reply`, and invalid argument rejection:

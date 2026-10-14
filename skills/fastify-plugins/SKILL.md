@@ -1,11 +1,11 @@
 ---
 name: fastify-plugins
-description: Use when creating, structuring, maintaining, reviewing pull requests, implementing features, fixing bugs, or configuring workflows and releases in Fastify plugin repositories (@fastify/* ecosystem plugins and fastify/skeleton-based plugin or utility repos). Covers how Fastify plugin repositories are made and structured, code best practices (fastify-plugin, CJS/ESM export triplet, @fastify/error, decorators, hooks, neostandard, .npmrc), unit and integration tests (node:test, borp, c8 --100, fastify.inject), TypeScript declarations and TSTyche type tests (types/index.d.ts, types/*.tst.ts), and plugin CI workflow and release standards. Do not use for maintaining fastify/fastify core (use fastify-core), fastify/workflows (use fastify-workflows), or fastify/website (use fastify-website).
+description: Maintain, implement, or review Fastify ecosystem plugins, type providers, and standalone utilities, including their code, tests, public types, CI, and releases. Distinguishes registered plugins from utility APIs and follows the target repository's configuration. Use fastify-core for fastify/fastify, fastify-workflows for reusable workflow internals, and fastify-website for the website.
 ---
 
 # Fastify Plugins Skill
 
-Use this skill when creating, structuring, reviewing, or maintaining a **Fastify plugin repository** (`@fastify/*` ecosystem plugins or [`fastify/skeleton`](https://github.com/fastify/skeleton)-based plugins and utilities).
+Use this skill when creating, structuring, reviewing, or maintaining **Fastify ecosystem plugins, type providers, or standalone utilities**, including `fastify-plugin`, `@fastify/error`, and `@fastify/deepmerge`.
 
 > **Companion Skills Boundary:**
 > - When reviewing a pull request or diff, pair this skill with [`fastify-code-review`](../fastify-code-review/SKILL.md) for the standardized review flow, severity classification, and Fastify maintainer tone.
@@ -13,20 +13,24 @@ Use this skill when creating, structuring, reviewing, or maintaining a **Fastify
 > - For the centralized reusable workflows repository ([`fastify/workflows`](https://github.com/fastify/workflows)), use [`fastify-workflows`](../fastify-workflows/SKILL.md).
 > - For the official Fastify website repository ([`fastify/website`](https://github.com/fastify/website)), use [`fastify-website`](../fastify-website/SKILL.md).
 
-## Step 1: Inspect Local Plugin Configuration
+## Step 1: Classify the Package & Inspect Local Configuration
 
 1. **Inspect Repository Files & Scripts:**
-   - Read `package.json`, `.npmrc`, `eslint.config.js` (or `.cjs`), `types/index.d.ts`, `types/*.tst.ts`, and `.github/workflows/*.yml`.
+   - Read contribution rules, `package.json` entrypoints/exports/scripts, `.npmrc`, ignore rules, linter configuration, declarations, tests, and workflows in the checkout. Local configuration takes precedence over the examples below.
    - Record the exact script names before running commands:
      - **Linter:** `npm run lint` (`eslint` with `neostandard`)
      - **Runtime tests:** `npm run test:unit` (or `npm run unit` in `@fastify/redis`, `npm run test:node` in TypeBox/JSON-Schema type providers)
      - **Type tests:** `npm run test:typescript` (or `npm run typescript` / `npm run test:types`)
+2. **Classify by Actual API:**
+   - **Registered plugins:** Apply wrapping, metadata, hooks, decorators, and registration tests only where the plugin's scope and behavior require them. Preserve intentional encapsulation.
+   - **Standalone utilities:** Preserve existing functions/classes, module exports, declaration layout, test runner, and release process. Do not add `fastify-plugin`, Fastify augmentations, or an export triplet merely to match the plugin template. Test through the utility's own API.
+   - **Type providers / TypeScript packages:** Follow their source/build/exports configuration and generated declarations; do not replace them with a hand-written CommonJS plugin layout.
 
 ---
 
 ## How Fastify Plugin Repositories Are Made & Structured
 
-All standardized `@fastify/*` plugin repositories are built from the [`fastify/skeleton`](https://github.com/fastify/skeleton) blueprint:
+The [`fastify/skeleton`](https://github.com/fastify/skeleton) blueprint illustrates a common plugin layout. Use it for applicable new plugins; preserve an existing package's supported structure and tooling:
 
 ```text
 .
@@ -72,9 +76,9 @@ Load the reference file(s) matching the parts of the plugin repository affected 
 
 ---
 
-## Core Best-Practice Checklist for Every Plugin PR / Patch
+## Best-Practice Checklist for the Affected Package
 
-1. **Code + Types + Tests + Docs Lockstep:** Any new or modified plugin option, decorator, hook, or error code in `index.js` / `lib/` **must** update `types/index.d.ts`, `types/index.tst.ts`, `test/*.test.js`, and `README.md` in the same change.
-2. **100% Coverage Discipline:** Almost all Fastify plugins enforce 100% line/branch coverage (`c8 --100` or `borp -C --check-coverage --lines 100`). Cover both happy paths and validation/error branches.
-3. **Export Triplet Consistency:** Ensure `index.js` exports `module.exports = plugin`, `module.exports.default = plugin`, and `module.exports.fastify<Name> = plugin`, and verify all import styles in `types/index.tst.ts`.
-4. **Standard Caller Workflows & OIDC Releases:** Keep plugin `.github/workflows/` as thin callers of `fastify/workflows` pinned to 40-character commit SHAs, and use `reusable-release.yml` with npm trusted publishing and a protected `release` environment.
+1. **Code, Types, Tests & Docs:** Test changed runtime behavior and regressions. When public contracts change, update the relevant declarations, type tests, and documentation using existing paths. An internal fix need not change an unchanged public declaration.
+2. **Coverage Discipline:** Preserve metrics and thresholds from scripts, runner configuration, and CI. Distinguish line-only gates from branch/function gates; report coverage separately from ordinary test results.
+3. **Export Compatibility:** Preserve supported imports. Check the CJS/default/named triplet where a plugin exposes it, and the actual exports for utilities and type providers.
+4. **Workflow & Release Compatibility:** Follow the checkout's caller workflows and release process. For repositories using `fastify/workflows`, keep external references SHA-pinned and preserve their trusted-publishing and release-environment setup.

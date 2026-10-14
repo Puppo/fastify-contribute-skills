@@ -2,6 +2,8 @@
 
 Load this reference when reviewing or implementing runtime code (`index.js`, `lib/*.js`), `package.json`, `.npmrc`, or `eslint.config.js` in a Fastify plugin repository.
 
+The examples describe registered plugins. For standalone utilities, preserve the actual exported API, module layout, dependencies, and local tooling; plugin wrappers, decorators, and registration metadata do not apply. Read the target checkout before adopting template versions or settings.
+
 ---
 
 ## 1. Standard `package.json`, `.npmrc` & Linter Setup
@@ -65,7 +67,7 @@ Official `@fastify/*` plugins are authored in CommonJS by default (`"type": "com
 > `"test:unit": "borp -C --check-coverage --lines 100 --reporter=@jsumners/line-reporter"` with a `.borp.yaml` file containing `files: ['test/**/*.test.js']`. Always preserve the existing runner in `package.json`.
 
 ### `.npmrc` Supply-Chain Hardening
-Every Fastify plugin repository includes a `.npmrc` file at the repository root with these three settings (from `fastify/skeleton`):
+The skeleton baseline uses these `.npmrc` settings; confirm the target repository's configuration and contribution rules:
 
 ```ini
 ignore-scripts=true
@@ -73,7 +75,7 @@ min-release-age=7
 package-lock=false
 ```
 
-- Do **not** commit `package-lock.json` in Fastify plugin repositories (`package-lock=false`).
+- Follow the target repository's lockfile policy and existing tracked files. Do not add a lockfile where that policy excludes it, or remove one from a repository that maintains it.
 
 ### Flat ESLint Configuration (`eslint.config.js`)
 Active Fastify plugins use ESLint v9 flat config powered by `neostandard` with TypeScript linting enabled (`ts: true` so `types/*.d.ts` and `types/*.tst.ts` are linted too):

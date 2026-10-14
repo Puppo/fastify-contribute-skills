@@ -10,12 +10,13 @@ Use this skill whenever reviewing a pull request, commit range, or branch diff i
 ## Core Principles
 
 1. **Strictly Read-Only During Review:**
-   - Never edit, stage, or commit tracked repository files when asked to review a PR or diff.
-   - You may run read-only inspection commands (`git diff`, `git log`, `gh pr view`, `gh pr diff`) and non-mutating validation scripts (`npm run lint`, `npm run unit`, `npm run test:unit`, `npm run test:typescript`, `npm run check`).
+   - Preserve the user's working tree and index; do not edit, stage, or commit their files during review.
+   - Inspect scripts and their lifecycle hooks before execution; a script named `test` or `lint` is not necessarily non-mutating. Run generators and checks that rewrite tracked files only in an isolated temporary checkout of the reviewed revision.
+   - Draft review comments locally. Posting reviews or changing PR metadata requires an explicit user request.
 2. **Pair with the Matching Repository Skill:**
    - Always combine this skill with the domain skill for the target repository so technical checks match local conventions:
      - `fastify/fastify` -> load [`fastify-core`](../fastify-core/SKILL.md)
-     - `@fastify/*` plugins & `fastify/skeleton` repos -> load [`fastify-plugins`](../fastify-plugins/SKILL.md)
+     - Fastify plugins and standalone utilities -> load [`fastify-plugins`](../fastify-plugins/SKILL.md), selecting only checks applicable to the package's exported API
      - `fastify/workflows` -> load [`fastify-workflows`](../fastify-workflows/SKILL.md)
      - `fastify/website` -> load [`fastify-website`](../fastify-website/SKILL.md)
 3. **Evidence Over Invention:**
@@ -34,36 +35,33 @@ Use this skill whenever reviewing a pull request, commit range, or branch diff i
 Follow these 6 steps in order on every PR:
 
 ### Step 1: Identify Repository & Load Companion Skill
-- Inspect `package.json` (and `.github/workflows/`) to identify the repository archetype.
+- Record the target repository, PR base SHA, and head SHA (or the explicitly requested local comparison range). Inspect files at that revision to identify the repository archetype, distinguishing registered plugins from standalone utilities.
 - Load the corresponding repository skill ([`fastify-core`](../fastify-core/SKILL.md), [`fastify-plugins`](../fastify-plugins/SKILL.md), [`fastify-workflows`](../fastify-workflows/SKILL.md), or [`fastify-website`](../fastify-website/SKILL.md)).
 
 ### Step 2: Check PR Metadata, Title & Governance
-Read [references/review-flow-and-checklists.md](references/review-flow-and-checklists.md) and verify:
-- **PR Title**: Must follow Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `perf:`, `ci:`, `refactor:`, `build:`) as enforced by `fastify/action-pr-title`.
-- **No Version Bump**: `package.json#version` must **not** be modified in a PR (`CONTRIBUTING.md`: releases are cut separately by maintainers).
-- **Artifact & Lockfile Hygiene**:
-  - No `package-lock.json` committed in plugin repos where `.npmrc` sets `package-lock=false`.
-  - No git-ignored generated data (`src/content/docs/`, `src/data/*.json`) committed in `fastify/website`.
-  - In `fastify/fastify`, if `build/build-validation.js` or `build/build-error-serializer.js` changed, verify `lib/config-validator.js` or `lib/error-serializer.js` was regenerated cleanly.
-- **Target Branch & Semver Scope**: Check whether breaking changes are targeting the right branch (`main` vs `next` or maintenance branches `4.x`/`5.x`).
+Read [references/review-flow-and-checklists.md](references/review-flow-and-checklists.md). Establish policy from the target checkout's contribution rules, package scripts, ignore rules, tracked files, and workflows; compare the base when the PR changes those rules.
+- **Title, Branch & Version**: Apply the repository's actual requirements. Distinguish ordinary contributions from documented release PRs, where version bumps can be expected.
+- **Artifact & Lockfile Hygiene**: Reject unintended generated output according to repository evidence. Core's `build/` sources and generated validators are maintained files; the website's tracked lockfile is valid.
+- **Policy Uncertainty**: Ask a question when a material rule cannot be confirmed; do not turn a convention in this skill into an unsupported blocker.
 
 ### Step 3: Audit the Diff Across All Affected Areas
 Inspect the full diff (`gh pr diff` or `git diff <base>...HEAD`) against the domain rules in the companion skill:
 - **Runtime & Architecture**: Encapsulation (`fastify-plugin`), hook lifecycle, `@fastify/error` (`FST_ERR_*`), V8 monomorphic shapes (`Request`/`Reply` in core), security boundaries (prototype poisoning, header/path injection, XSS sanitization in website), and resource cleanup (`onClose`).
 - **TypeScript & `.d.ts` Sync**: Every new/changed public option, decorator, hook, or return type in `.js` must be reflected in `index.d.ts` / `types/index.d.ts` / `fastify.d.ts`.
 - **Tests & Type Tests**:
-  - Bug fixes **must** include a regression test that fails without the fix.
-  - Features **must** include runtime unit/integration tests (maintaining `100%` coverage where enforced by `c8 --100` or `borp --check-coverage`) and TSTyche type tests (`*.tst.ts` / `*.test-d.ts`).
-  - Verify tests use `fastify.inject()` by default, or `fastify.listen({ port: 0 })` + `t.after(() => fastify.close())` when testing real sockets.
-- **Docs & Workflows**: Verify `README.md` / `docs/` updates match runtime and type changes, error/warning codes are documented, and any `.github/workflows/` changes pin actions to 40-char commit SHAs.
+  - Runtime bug fixes need regression coverage; public type changes need type tests using the repository's configured runner. Select validation for the affected behavior; docs-only and workflow-only changes do not require unrelated runtime or type tests.
+  - Preserve the coverage metrics and thresholds configured in the checkout. Passing unit tests alone does not prove coverage.
+  - For Fastify request behavior, prefer `fastify.inject()`; use real sockets with teardown when necessary. Test standalone utilities through their own API.
+- **Docs & Workflows**: Verify relevant documentation matches changed public behavior and external actions follow the repository's pinning policy. Relative local workflow references do not take a commit SHA.
 
 ### Step 4: Run Local Verification (Read-Only)
-- Run the repository's lint, typecheck, and test scripts when dependencies are available locally.
-- Record the exact commands executed and their exit status. If a check cannot run locally (e.g., missing Docker service or unbuilt dependencies), state that explicitly rather than guessing.
+- Follow the revision and isolation procedure in [references/review-flow-and-checklists.md](references/review-flow-and-checklists.md). Verify local `HEAD` matches the reviewed head and no local files contaminate results before running checks.
+- Use an isolated temporary checkout when revisions differ, local changes are present, or a check regenerates tracked files. If isolation or prerequisites are unavailable, mark the check `Not run` with the reason.
+- Record exact commands, exit status, and tested SHA. Report remote CI separately with its revision; never attribute results from another checkout or commit to this PR.
 
 ### Step 5: Classify Findings by Severity
 Group findings strictly into three levels (or zero findings if clean):
-- **`[Blocking]`**: Bugs, regressions, missing regression/unit/type tests, broken `.d.ts` contracts, security issues, unintended breaking changes, or failing CI/lint/coverage gates.
+- **`[Blocking]`**: Demonstrated bugs, regressions, missing tests needed for affected behavior or public types, broken contracts, security issues, unintended breaking changes, or confirmed repository-policy/check failures. Missing local prerequisites are a verification limitation, not proof that the PR fails.
 - **`[Suggestion]`**: Concrete improvements to performance, readability, test assertions, or idiomatic Fastify patterns that do not block correctness (include a ````suggestion` block).
 - **`[Question]`**: Clarifying questions about design intent, edge cases, or semver expectations.
 
