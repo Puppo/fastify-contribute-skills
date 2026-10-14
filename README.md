@@ -36,13 +36,18 @@ Install `fastify-code-review` alongside the repository skills you want to review
 
 ### Companion skills
 
-For advanced type-test authoring, install the [TSTyche skills](https://tstyche.org/guides/agent-skills):
+For advanced type-test authoring in `fastify-core` and `fastify-plugins`, install the [TSTyche skills](https://tstyche.org/guides/agent-skills):
 
 ```bash
 npx skills add tstyche/tstyche-skills
 ```
 
-The core and plugin skills include basic type-test guidance and use installed TSTyche companion skills when needed. The website skill integrates with its repository's embedded `frontend-design` and `web-design-guidelines` skills under `.agents/skills/`.
+For `fastify-website`, the [`fastify/website`](https://github.com/fastify/website) repository already bundles [`frontend-design`](https://github.com/fastify/website/blob/main/.agents/skills/frontend-design/SKILL.md) and [`web-design-guidelines`](https://github.com/fastify/website/blob/main/.agents/skills/web-design-guidelines/SKILL.md) under [`.agents/skills/`](https://github.com/fastify/website/tree/main/.agents/skills) (tracked in [`skills-lock.json`](https://github.com/fastify/website/blob/main/skills-lock.json)). If you are reviewing `fastify/website` pull requests from outside a local checkout, you can also install them globally:
+
+```bash
+npx skills add anthropics/skills --skill frontend-design
+npx skills add vercel-labs/agent-skills --skill web-design-guidelines
+```
 
 ## Examples
 

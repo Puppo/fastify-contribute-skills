@@ -7,6 +7,13 @@ description: Maintain or review UI, routing, build-time data, accessibility, and
 
 Specialized workflow and reference guide for maintaining, reviewing pull requests, and implementing changes in [`fastify/website`](https://github.com/fastify/website) (`@fastify/website`, deployed at [fastify.dev](https://fastify.dev)).
 
+> **Companion Skills Boundary:**
+> - **Repository-Embedded Skills ([`.agents/skills/`](https://github.com/fastify/website/tree/main/.agents/skills) & [`skills-lock.json`](https://github.com/fastify/website/blob/main/skills-lock.json)):** `fastify/website` ships with its own local Agent Skills (currently [`frontend-design`](https://github.com/fastify/website/blob/main/.agents/skills/frontend-design/SKILL.md) and [`web-design-guidelines`](https://github.com/fastify/website/blob/main/.agents/skills/web-design-guidelines/SKILL.md), symlinked in `.claude/skills/`). Always inspect `.agents/skills/` and `skills-lock.json` in the target checkout (or fetch them from `fastify/website` when reviewing remotely) and load the matching embedded skill(s) for UI, styling, copy, and accessibility work.
+> - When reviewing a pull request or diff in `fastify/website`, pair this skill with [`fastify-code-review`](../fastify-code-review/SKILL.md) for the standardized review flow, severity classification, and Fastify maintainer tone.
+> - For `fastify/fastify` core code and `docs/`: use [`fastify-core`](../fastify-core/SKILL.md).
+> - For `@fastify/*` ecosystem plugins and utilities: use [`fastify-plugins`](../fastify-plugins/SKILL.md).
+> - For `fastify/workflows` reusable CI workflows: use [`fastify-workflows`](../fastify-workflows/SKILL.md).
+
 Repository maps, tool versions, and workflow defaults below are orientation examples. Confirm them in the target checkout before applying them; its configuration and contribution rules determine applicability. Source root observed on 2026-10-14: [fastify/website at `9ae2326`](https://github.com/fastify/website/tree/9ae232617372934813e7036e2674a6b0ae9bb7e5).
 
 ## Scope & Repository Identity
@@ -16,15 +23,11 @@ Repository maps, tool versions, and workflow defaults below are orientation exam
   - **Framework Documentation & Ecosystem List**: Never edit or commit files under `src/content/docs/` or `public/docs/`. Fastify documentation is authored in `fastify/fastify/docs/` (including `docs/Guides/Ecosystem.md`) and fetched at build time by `scripts/fetch-docs.mjs`. Use **`fastify-core`** when documentation prose or ecosystem entries need changes.
   - **Benchmarks Data**: `src/data/benchmarks.json` is fetched at build time from `fastify/benchmarks` by `scripts/download-benchmarks.mjs`. Only `scripts/frameworks.json` and the rendering components live in `fastify/website`.
   - **Static Site Roster & Sponsors**: Maintainer rosters (`LEADS`, `COLLABORATORS`, `PAST_COLLABORATORS`), `SPONSORS`, `FEATURES`, and `NAV` are maintained directly in `src/data/site.ts` (with sponsor logos in `public/organizations/`).
-- **Project-Embedded UI/UX Skills (`skills-lock.json` & `.agents/skills/`)**:
-  - `fastify/website` bundles two local Agent Skills in `.agents/skills/` (and symlinked in `.claude/skills/`), tracked in `skills-lock.json`:
-    1. **`frontend-design`** (`.agents/skills/frontend-design/SKILL.md`, source: `anthropics/skills`): Load and follow when designing new UI sections, reshaping layouts, choosing typography/palette hierarchy, or writing UI copy so changes preserve Fastify's intentional telemetry/velocity visual identity rather than generic defaults.
-    2. **`web-design-guidelines`** (`.agents/skills/web-design-guidelines/SKILL.md`, source: `vercel-labs/agent-skills`): Load and follow when reviewing UI PRs, auditing accessibility/UX, or verifying compliance with the Vercel Web Interface Guidelines (`https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`).
-- **Related Fastify Skills**:
-  - When reviewing a pull request or diff in `fastify/website`, pair this skill with [`fastify-code-review`](../fastify-code-review/SKILL.md) for the standardized review flow, severity classification, and Fastify maintainer tone.
-  - For `fastify/fastify` core code and `docs/`: use [`fastify-core`](../fastify-core/SKILL.md).
-  - For `@fastify/*` ecosystem plugins and utilities: use [`fastify-plugins`](../fastify-plugins/SKILL.md).
-  - For `fastify/workflows` reusable CI workflows: use [`fastify-workflows`](../fastify-workflows/SKILL.md).
+- **Project-Embedded UI/UX Skills ([`skills-lock.json`](https://github.com/fastify/website/blob/main/skills-lock.json) & [`.agents/skills/`](https://github.com/fastify/website/tree/main/.agents/skills))**:
+  - Discover all repository-bundled skills by inspecting `skills-lock.json` and `.agents/skills/*/SKILL.md` in the target checkout (or via `gh api repos/fastify/website/contents/.agents/skills` when reviewing outside a local clone) so any newly added repository skills are automatically picked up.
+  - Currently bundled skills in `fastify/website` (also symlinked in `.claude/skills/`):
+    1. **[`frontend-design`](https://github.com/fastify/website/blob/main/.agents/skills/frontend-design/SKILL.md)** (`.agents/skills/frontend-design/SKILL.md`, upstream: [`anthropics/skills`](https://github.com/anthropics/skills)): Load and follow when designing new UI sections, reshaping layouts, choosing typography/palette hierarchy, or writing UI copy so changes preserve Fastify's intentional telemetry/velocity visual identity rather than generic defaults.
+    2. **[`web-design-guidelines`](https://github.com/fastify/website/blob/main/.agents/skills/web-design-guidelines/SKILL.md)** (`.agents/skills/web-design-guidelines/SKILL.md`, upstream: [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills)): Load and follow when reviewing UI PRs, auditing accessibility/UX, or verifying compliance with the Vercel Web Interface Guidelines (`https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`).
 
 ---
 
