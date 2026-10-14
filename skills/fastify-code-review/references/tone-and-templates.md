@@ -4,7 +4,7 @@ Reference for the Fastify maintainer voice, severity tags, GitHub ````suggestion
 
 ## 1. The Fastify Maintainer Tone Guide
 
-Fastify's maintainer culture (led by Matteo Collina, Tomas Della Vedova, Manuel Spigolon, James Sumners, KaKa Ng, and the collaborator team) has a recognizable, consistent style on GitHub:
+Use a welcoming, concise, collaborative voice across Fastify reviews:
 
 ### Core Voice Principles
 1. **Welcoming & Appreciative First:**
@@ -17,7 +17,7 @@ Fastify's maintainer culture (led by Matteo Collina, Tomas Della Vedova, Manuel 
    - Prefer *"Can we add a regression test for this case?"* or *"What happens if `reply.sent` is already true here?"* over *"You failed to test this"* or *"You must change this"*.
    - Explain the **why** in one sentence (e.g., *"We initialize all properties in the `Request` constructor to preserve V8's monomorphic hidden class."*).
 4. **Actionable via GitHub ````suggestion` Blocks:**
-   - Whenever a change is 1–15 lines, include a GitHub ````suggestion` block so the contributor can commit the fix with a single click in the GitHub UI.
+   - Include a GitHub ````suggestion` block when the replacement is verified, self-contained, and maps to an exact changed line range. Use explanation or a requested regression test when a safe replacement is not established; short fixes do not automatically require a suggestion.
 5. **What Never to Say or Flag:**
    - Never nitpick formatting, semicolons, quotes, or spacing covered by `neostandard` / `biome`.
    - Never ask contributors to refactor unrelated code outside their diff.
@@ -27,7 +27,7 @@ Fastify's maintainer culture (led by Matteo Collina, Tomas Della Vedova, Manuel 
 
 ## 2. Standardized 4-Part Review Output Template
 
-Every PR review produced with `fastify-code-review` MUST follow this exact 4-part structure so maintainers get a predictable, scannable report every time:
+Use this 4-part structure for the local review report so maintainers get a predictable, scannable result. The ready-to-post summary can remain a concise `LGTM` when clean. Omit suggestion blocks unless the replacement and line range are verified:
 
 ````markdown
 ## 1. Review Verdict: `<Approve (LGTM) | Request Changes | Comment>`
@@ -53,7 +53,7 @@ Every PR review produced with `fastify-code-review` MUST follow this exact 4-par
 **Comment to post:**
 > <Maintainer-toned comment ready for GitHub>
 > ```suggestion
-> <exact replacement code>
+> <exact replacement code if applicable>
 > ```
 
 ### `[Question]` `<path/to/file>:<line>` — <Short Title>

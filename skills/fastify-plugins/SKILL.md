@@ -13,6 +13,8 @@ Use this skill when creating, structuring, reviewing, or maintaining **Fastify e
 > - For the centralized reusable workflows repository ([`fastify/workflows`](https://github.com/fastify/workflows)), use [`fastify-workflows`](../fastify-workflows/SKILL.md).
 > - For the official Fastify website repository ([`fastify/website`](https://github.com/fastify/website)), use [`fastify-website`](../fastify-website/SKILL.md).
 
+Repository maps, dependency versions, and workflow defaults below are examples; confirm them in the target checkout. Blueprint source root observed on 2026-10-14: [fastify/skeleton at `faa3f75`](https://github.com/fastify/skeleton/tree/faa3f75d001739c9f1fae00dd20aab1175341898). Official documentation for the supported Fastify version and package tests determine behavior.
+
 ## Step 1: Classify the Package & Inspect Local Configuration
 
 1. **Inspect Repository Files & Scripts:**

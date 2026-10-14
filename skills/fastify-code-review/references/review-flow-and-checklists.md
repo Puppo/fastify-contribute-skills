@@ -84,7 +84,7 @@ Pair with the matching repository skill and apply only checks relevant to the ch
 - [ ] **Runtime and coverage**: Test changed behavior and regression cases through the appropriate API. Use the repository's runner and coverage thresholds; `inject()` applies to request behavior, not all utility tests.
 
 ### C. `fastify/workflows` (with `fastify-workflows`)
-- [ ] **Backward Compatibility of `workflow_call`**: Are existing inputs, types, and default values preserved so 60+ caller repos do not break?
+- [ ] **Backward Compatibility of `workflow_call`**: Are existing inputs, types, defaults, and caller permissions preserved? Inspect the representative caller scenarios in [the workflow validation guide](../../fastify-workflows/references/validation-and-security.md).
 - [ ] **40-Character Commit SHA Pinning**: Are external actions pinned to full 40-char commit SHAs with version comments? Relative local workflow references remain paths without SHAs.
 - [ ] **Shell-Injection Hardening**: Are untrusted GitHub contexts (`github.event.inputs.*`, `github.head_ref`, PR titles/bodies) passed via `env:` variables and double-quoted in `run:` blocks instead of interpolated with `${{ ... }}`?
 - [ ] **Least-Privilege Permissions**: Does the workflow set `permissions: {}` or `permissions: contents: read` at the top level and scope write permissions to individual jobs?
@@ -99,3 +99,4 @@ Pair with the matching repository skill and apply only checks relevant to the ch
   - Do UI changes comply with `.agents/skills/frontend-design/SKILL.md` and `.agents/skills/web-design-guidelines/SKILL.md`?
 - [ ] **Build Data Resilience**: Do changes in `scripts/*.mjs` succeed locally even when `GH_TOKEN` is unset?
 - [ ] **Biome & Astro Check**: Do `npm run lint` (`biome check`), `npm run check` (`astro check`), and `npm run build:website` pass?
+- [ ] **Browser Behavior**: For UI/routing changes, exercise affected scenarios in [the production preview checklist](../../fastify-website/references/validation-and-workflows.md): version-scoped search, keyboard/focus, themes, version switching, Markdown routes, and non-root base paths. Report browser execution separately from the build.

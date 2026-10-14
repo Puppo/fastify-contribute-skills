@@ -220,5 +220,17 @@ const FST_MY_PLUGIN_UNAUTHORIZED = createError(
 )
 ```
 
-- Instantiate errors at module top-level (not inside request handlers).
+- Define error constructors at module scope with `createError`; instantiate a fresh error where each failure occurs, such as `throw new FST_MY_PLUGIN_INVALID_OPTION(optionName)`. Do not share an error instance across requests: its stack and message must describe that failure.
 - Export error classes or error maps when consumers or TypeScript declarations (`types/index.d.ts`) reference them (e.g., `@fastify/bearer-auth`, `@fastify/multipart`, `@fastify/jwt`).
+
+---
+
+## 5. Hook & Schema Behavior Boundaries
+
+- To reject a request from an async `onRequest` or `preHandler` hook, send the response, for example `return reply.code(403).send({ error: 'Forbidden' })`. Returning a plain object or setting the status alone does not send it. In callback hooks, send the reply without continuing with `done()`; when sending outside an async hook's promise chain, return `reply`.
+- `preSerialization` operates before serialization; strings, Buffers, and streams commonly bypass it in the default send path. Test null, explicit content types, and custom serializers against the target version: Fastify 5.12.7 invokes this hook for null in its default path despite the documentation's exclusion list. `onSend` receives the outgoing payload and must preserve the supported payload types. `onError` is for side effects, not sending or replacing the error response; use `setErrorHandler` for that contract.
+- For plugins that compile schemas, accept trusted application schemas rather than request-supplied definitions. Initial validation should not access databases; use an appropriate later hook for those checks.
+- A synchronous custom validator returns `{ value }` or `{ error }`. An asynchronous validator fails by rejection, and its resolved value is not interpreted as that result envelope. Test the compiler actually supported by the package and Fastify version.
+- When a plugin supplies response schemas or serializers, test sensitive-field exclusion and status/content-type selection against its actual schema and serializer configuration.
+
+Behavior references checked on 2026-10-14 against Fastify revision `e222f53`: [Hooks](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Hooks.md), [Reply send implementation](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/lib/reply.js), and [Validation and Serialization](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Validation-and-Serialization.md). Check the target version before applying these contracts.

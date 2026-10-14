@@ -26,7 +26,7 @@ Fastify's performance depends on keeping `Request` and `Reply` instances monomor
    - Pre-compute route context properties, hook runner functions, schema validators, and serializers inside `lib/route.js` or plugin registration.
    - Check whether a hook array is empty (`context.onRequest !== null`) at route setup so routes with no hooks skip the hook runner entirely during request execution.
 2. **Avoid Mixing `async` and `done` Callbacks:**
-   - Fastify emits `FSTWRN003` when a handler/hook mixes `async` and callback styles (`done`).
+   - Plugin registration that mixes async and callback styles can emit `FSTWRN003`. Async hooks with an invalid callback-style signature are rejected with `FST_ERR_HOOK_INVALID_ASYNC_HANDLER`; do not apply the plugin warning to hooks or route handlers.
    - In core hook runners (`lib/hooks.js`), handle Promise returns (`then(next, done)`) and synchronous `done()` callbacks on strictly separate branches so `next()` / `done()` can never be invoked twice.
 3. **Avoid Unnecessary Closures and Allocations in `lib/handle-request.js` & `lib/reply.js`:**
    - Use named module-level functions and pass context/state as parameters rather than allocating closures per request.
@@ -55,7 +55,7 @@ Always run `npm run lint` after editing any `.js`, `.d.ts`, or `.tst.ts` file.
 
 ## 4. Core TypeScript Architecture (`fastify.d.ts` & `types/*.d.ts`)
 
-Unlike plugins that have a single `types/index.d.ts`, `fastify/fastify` splits its declarations across `fastify.d.ts` (root entry) and 15 modular files in `types/*.d.ts` (`instance.d.ts`, `route.d.ts`, `hooks.d.ts`, `request.d.ts`, `reply.d.ts`, `register.d.ts`, `plugin.d.ts`, `schema.d.ts`, `type-provider.d.ts`, `logger.d.ts`, `errors.d.ts`, `content-type-parser.d.ts`, `context.d.ts`, `server-factory.d.ts`, `utils.d.ts`):
+Unlike plugins that have a single `types/index.d.ts`, `fastify/fastify` splits its declarations across `fastify.d.ts` (root entry) and modular files in `types/*.d.ts`. Inspect the checkout for the current module list:
 
 1. **Preserve the 5 Core Instance Generics:**
    `FastifyInstance` and `fastify()` factory overloads carry 5 ordered type parameters with defaults:
@@ -78,6 +78,22 @@ Unlike plugins that have a single `types/index.d.ts`, `fastify/fastify` splits i
    Never drop or hardcode these generics to `any` or defaults when adding method overloads.
 3. **Export Parity in `fastify.d.ts`:**
    When adding a new public type in `types/*.d.ts`, re-export it in `fastify.d.ts` under `declare namespace fastify { export type { ... } }` so consumers can import it directly from `'fastify'`.
+4. **Type-Provider Scope:**
+   Provider inference does not propagate globally into encapsulated plugins. Test inference inside the affected registration scope and preserve its provider generic or explicit `withTypeProvider<...>()` call; global declaration augmentation does not prove that a decorator exists in every runtime scope.
+
+---
+
+## Schema Validation & Serialization Contracts
+
+Apply these checks when changing schema compilation, validation, serialization, or their hooks:
+
+- Treat schemas passed to compilers as trusted application code: default compilation uses `new Function()`. Do not introduce compilation of request-supplied schemas.
+- Keep database and other asynchronous business checks after initial validation, typically in `preHandler`, rather than adding them to initial schema validation.
+- Synchronous custom validators use `{ value }` for transformed data or `{ error }` for failure. Test their interaction with async `preValidation` hooks without throwing from the synchronous validator.
+- Asynchronous validators signal failure by rejecting. Their resolved data is not a synchronous `{ value, error }` result envelope. Test payloads containing literal `value` and `error` keys so they cannot replace request data or manufacture validation failures.
+- Test the selected response schema for the affected status/content type, including whether sensitive fields are excluded under its `additionalProperties` policy. Preserve custom serializer behavior; a response schema is not a universal output-validation guarantee.
+
+Behavior references checked on 2026-10-14 against Fastify revision `e222f53`: [Hooks](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Hooks.md), [Warnings](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Warnings.md), [Errors](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Errors.md), [Validation and Serialization](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Validation-and-Serialization.md), and [Type Providers](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Type-Providers.md). Resolve version-specific differences from the target branch's docs and tests.
 
 ---
 

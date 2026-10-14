@@ -1,6 +1,6 @@
 ---
 name: fastify-workflows
-description: Use when maintaining, reviewing pull requests, adding or updating reusable workflows, matrices, service containers, security policies, or documentation in the fastify/workflows repository (@fastify/workflows). Covers all reusable CI workflows (plugins-ci.yml, nested-quality.yml, plugins-ci-redis/postgres/mysql/mongo/kafka/elasticsearch/package-manager.yml), reusable-release.yml, reusable-ossf-scorecard.yml, lock-threads.yml, internal validation (action-validator in validate-workflows-files.yml), SHA pinning, shell-injection hardening, and optic tag-sync releases. Do not use for individual Fastify plugin repositories (use fastify-plugins instead).
+description: Maintain or review reusable CI and release definitions in fastify/workflows, including caller compatibility, security, validation, and tag releases. Use fastify-plugins when configuring caller workflows in individual plugin or utility repositories.
 ---
 
 # Fastify Workflows Repository Maintainer (`fastify/workflows`)
@@ -10,6 +10,8 @@ Use this skill when maintaining, reviewing pull requests, or implementing change
 > **Boundary Note:** This skill is specifically for maintaining the centralized `fastify/workflows` repository. When reviewing a pull request in `fastify/workflows`, pair this skill with [`fastify-code-review`](../fastify-code-review/SKILL.md). When configuring or maintaining an individual `@fastify/*` plugin repository that *calls* these workflows, use [`fastify-plugins`](../fastify-plugins/SKILL.md) instead.
 
 ---
+
+Repository maps, tool versions, and workflow defaults below are orientation examples. Confirm them in the target checkout before applying them; its configuration and contribution rules determine applicability. Source root observed on 2026-10-14: [fastify/workflows at `b1a11bc`](https://github.com/fastify/workflows/tree/b1a11bce713bc857e52b2231fec3c89071ad3135).
 
 ## Step 1: Recognize `fastify/workflows` Repository Characteristics
 
@@ -71,6 +73,6 @@ Load the reference file(s) matching your task in `fastify/workflows`:
 
 ## Core `fastify/workflows` Maintainer Rules
 
-1. **Synchronize Shared Inputs & Node Defaults Across All `plugins-ci*.yml` Files:** When updating default `node-versions` (e.g., `'["24", "26"]'`), `actions/checkout`, `actions/setup-node`, or `fastify/github-action-merge-dependabot`, update `plugins-ci.yml`, `plugins-ci-package-manager.yml`, and all 6 `plugins-ci-<service>.yml` files consistently.
+1. **Synchronize Shared Inputs & Node Defaults Across All `plugins-ci*.yml` Files:** When updating default `node-versions` (e.g., `'["24", "26"]'`), `actions/checkout`, `actions/setup-node`, or `fastify/github-action-merge-dependabot`, update `plugins-ci.yml`, `plugins-ci-package-manager.yml`, and all `plugins-ci-<service>.yml` files consistently.
 2. **40-Character Commit SHA Pinning:** Every external `uses:` action must be pinned to a full 40-character commit SHA with a trailing version comment (`# vX.Y.Z`). Internal calls within `fastify/workflows` use `./.github/workflows/<file>.yml`.
-3. **Validate with `action-validator` & Sync `README.md`:** Every workflow change must pass `action-validator` (as enforced by `validate-workflows-files.yml`) and update the corresponding input/usage tables in `README.md`.
+3. **Validate & Sync `README.md`:** Run the configured `action-validator` check, inspect affected caller scenarios, and update input/usage documentation when the contract changes. Report syntax, schema validation, contract inspection, and execution evidence separately; unavailable checks are `Not run`.

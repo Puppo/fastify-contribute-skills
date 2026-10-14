@@ -48,6 +48,17 @@ Unlike Fastify core and plugin repositories (which use ESLint + `neostandard`), 
 - `KEEP_CACHE=1`: Retains downloaded tarballs in `.cache/docs/` after `fetch-docs.mjs` finishes.
 - `DOCS_MIN_MAJOR`: Minimum Fastify major version to fetch (defaults to `3`).
 
+### Production Preview Checks for UI & Routing Changes
+
+After a successful production build, run the checkout's preview command and exercise affected behavior in a real browser. Select checks matching the diff; build success alone does not establish interaction correctness.
+
+- **Versioned search:** Open search on `latest` and a supported older version. Confirm results belong to the selected version and their links resolve. Use the production preview because Pagefind requires the built index.
+- **Keyboard access:** Open the search dialog from its trigger and shortcut, navigate by keyboard, close with Escape, and verify focus returns to the trigger. Check visible focus, labels, and mobile navigation where affected.
+- **Themes:** Switch between dark and light, reload, and check persistence, readable contrast, and code blocks. Check reduced-motion behavior when changing animations.
+- **Version switching and docs links:** Switch the same page across available versions, verify the selected version/banner, anchors, canonical/edit links, and the raw Markdown endpoint. For pages absent in another version, verify the checkout's intended missing-page behavior rather than inventing a fallback.
+- **Base paths:** Check internal links, assets, Markdown routes, and Pagefind requests with a non-root base using the existing base configuration in an isolated checkout. Confirm case and dots in versioned paths survive rewriting.
+- **Runtime evidence:** Record the preview URL, tested routes, browser observations, and relevant console/network errors. If browser execution is unavailable, report it as `Not run` with the reason; static UI audits and successful builds remain separate evidence.
+
 ---
 
 ## 4. Repository Security & Package Settings (`.npmrc` & `.nvmrc`)

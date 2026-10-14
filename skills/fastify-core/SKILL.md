@@ -1,6 +1,6 @@
 ---
 name: fastify-core
-description: Use when maintaining, reviewing pull requests, implementing features, or fixing bugs in the fastify/fastify core repository. Covers Fastify core architecture and code (fastify.js, lib/*, build/* generated config-validator.js and error-serializer.js, symbols, avvio encapsulation, FST_ERR_* and FSTWRN*/FSTDEP* codes), core best practices (V8 monomorphic Request/Reply shapes, hot-path lifecycle, fastify.d.ts and types/*.d.ts generics, docs/Reference and Style-Guide.md), core testing (borp 100% coverage, test/types/*.tst.ts with tstyche, webpack/esbuild bundler tests, integration/), and fastify/fastify GitHub Actions workflows (ci.yml, coverage-nix/win, citgm.yml, test-compare, md-lint, links-check, backport). Do not use for standalone plugin repos (use fastify-plugins) or the fastify/workflows repo (use fastify-workflows).
+description: Maintain or review framework code, tests, public types, documentation, and CI in fastify/fastify. Use for core features and fixes; use fastify-plugins for ecosystem packages, fastify-workflows for reusable workflow internals, and fastify-website for the website.
 ---
 
 # Fastify Core Maintainer Skill (`fastify/fastify`)
@@ -14,6 +14,8 @@ Use this skill when reviewing a pull request, implementing a feature, or fixing 
 > - For the official Fastify website repository (`fastify/website`, `fastify.dev`), use [`fastify-website`](../fastify-website/SKILL.md).
 
 ---
+
+Repository maps, tool versions, and workflow defaults below are orientation examples. Confirm them in the target checkout before applying them; its configuration and contribution rules determine applicability. Source root observed on 2026-10-14: [fastify/fastify at `e222f53`](https://github.com/fastify/fastify/tree/e222f53aa267080b349eacdeaff03ea9a061e8c7).
 
 ## Step 1: Verify Target Branch, Governance & Local Scripts
 
@@ -67,7 +69,7 @@ Use this skill when reviewing a pull request, implementing a feature, or fixing 
 ├── docs/
 │   ├── Guides/                     # User guides (Style-Guide.md, Ecosystem.md, Contributing.md)
 │   └── Reference/                  # API reference (Errors.md, Warnings.md, Hooks.md, Server.md, etc.)
-└── .github/workflows/              # 20 core CI, coverage, CITGM, docs, and automation workflows
+└── .github/workflows/              # Core CI, coverage, CITGM, docs, and automation workflows
 ```
 
 ---
@@ -81,7 +83,7 @@ Load the reference file(s) matching the area of `fastify/fastify` affected by yo
 | **1. Code & Architecture (`code`)** | `fastify.js` and `lib/*.js` module map, `build/` code generators (`lib/config-validator.js` & `lib/error-serializer.js`) and `test:validator:integrity`, `lib/symbols.js`, `avvio` plugin encapsulation (`lib/plugin-override.js`), `lib/errors.js` (`FST_ERR_*`), and `lib/warnings.js` (`FSTWRN*`, `FSTSEC*`, `FSTDEP*`). | [references/code.md](references/code.md) |
 | **2. Best Practices, Performance & Types (`best-practices`)** | V8 monomorphic shapes on `Request`/`Reply` (`test/same-shape.test.js`), request lifecycle hot-path discipline, ESLint (`max-len: 120`, `comma-dangle: never`), `fastify.d.ts` + `types/*.d.ts` 5-parameter generic propagation, and `docs/` synchronizing rules (`Errors.md`, `Warnings.md`, `Style-Guide.md`, `Ecosystem.md`). | [references/best-practices.md](references/best-practices.md) |
 | **3. Testing & Type Testing (`test`)** | `borp` unit testing (`npm run unit`) and 100% coverage (`npm run coverage:ci-check-coverage`), `@matteo.collina/tspl` (`await p.completed`), `fastify.inject()` vs `fastify.listen({ port: 0 })`, `test/internals/`, `test/bundler/` (`webpack` & `esbuild`), `integration/`, and `test/types/*.tst.ts` (`tstyche`). | [references/test.md](references/test.md) |
-| **4. Workflows & CI Gates (`workflows`)** | All 20 workflows in `fastify/fastify/.github/workflows/`: `ci.yml` (`coverage-nix`, `coverage-win`, `test-unit`, `test-types`, `test-pino-compat`, `package`), `citgm.yml` (`citgm-core-plugins` label), `test-compare.yml`, `missing_types.yml`, `md-lint.yml`, `links-check.yml`, `lint-ecosystem-order.yml`, `pull-request-title.yml`, and `backport.yml`. | [references/workflows.md](references/workflows.md) |
+| **4. Workflows & CI Gates (`workflows`)** | Workflow domains in `fastify/fastify/.github/workflows/`: `ci.yml` (`coverage-nix`, `coverage-win`, `test-unit`, `test-types`, `test-pino-compat`, `package`), `citgm.yml` (`citgm-core-plugins` label), `test-compare.yml`, `missing_types.yml`, `md-lint.yml`, `links-check.yml`, `lint-ecosystem-order.yml`, `pull-request-title.yml`, and `backport.yml`. | [references/workflows.md](references/workflows.md) |
 
 ---
 

@@ -35,19 +35,31 @@ Every workflow in `.github/workflows/` must adhere to OSSF Scorecard and Fastify
 
 ## 2. Validating Workflow Changes Locally
 
-Because `fastify/workflows` has no `npm test` script, validate changes using these steps:
+Inspect the checkout's validation workflow and scripts. Report each level separately:
 
-1. **Run `action-validator` (if installed locally) or YAML Schema Checks:**
-   - In CI, `validate-workflows-files.yml` runs:
-     ```bash
-     find .github/workflows -type f \( -iname \*.yaml -o -iname \*.yml \) \
-       | xargs -I {} action-validator --verbose {}
-     ```
-   - If `action-validator` is installed in the environment (`which action-validator`), run it across `.github/workflows/*.yml`.
-   - If `action-validator` is not installed locally, parse all `.github/workflows/*.yml` files with Python (`yaml.safe_load`) or Ruby/Node YAML parsers to verify valid YAML syntax, and verify that every `needs:` job reference, `matrix` variable, and `inputs.*` reference matches defined keys.
-2. **Verify Matrix & Expression Types:**
-   - Confirm `node-versions` defaults are valid JSON arrays of strings (`'["24", "26"]'`) so `fromJson(inputs.node-versions)` evaluates cleanly.
-   - Confirm `automerge` `needs:` arrays match the exact job IDs in the workflow (`[fastify-dependency-integration, quality-check, test]` in `plugins-ci.yml` vs `[quality-check, test]` in service workflows).
+1. **YAML syntax:** Parse changed workflows with a YAML 1.2-compatible parser so the `on` key remains a string. If using a YAML 1.1 parser such as default PyYAML, account for its boolean-key coercion before inspecting triggers. Successful parsing proves syntax only.
+2. **Workflow schema:** Run the configured `action-validator` command when available. A common CI command is:
+   ```bash
+   find .github/workflows -type f \( -iname \*.yaml -o -iname \*.yml \) \
+     | xargs -I {} action-validator --verbose {}
+   ```
+   If the validator is unavailable, mark schema validation `Not run`; parsing or manual inspection does not substitute for it.
+3. **Contracts and expressions:** Inspect `needs`, inputs, permissions, matrix JSON, and guards in context, including reusable callers. For example, confirm `node-versions` is a JSON array of supported version strings and optional jobs can be skipped without allowing failures through the automerge guard. Static validation does not prove runtime expression evaluation or service readiness.
+4. **Execution evidence:** Use existing CI runs tied to the reviewed revision. Record run links, events, caller inputs, and observed results. If representative execution is unavailable, mark it `Not run` and state the remaining uncertainty. Dispatching workflows, changing labels, or running a publish path requires authorization for that external action.
+
+### Representative Caller Scenarios
+
+Select scenarios affected by the workflow change; use static inspection when execution would require an unauthorized external action:
+
+| Scenario | Expected contract |
+| --- | --- |
+| Minimal caller | Omitted optional inputs retain documented defaults; required inputs and permissions are explicit. |
+| Overrides | Custom Node matrices, lint/license flags, and affected service versions reach the correct jobs and nested workflows. |
+| Fork pull request | Test/validation jobs tolerate the available token/secrets; untrusted code does not gain privileged execution and automerge remains disabled. |
+| Optional integration job | An intentional skip does not block successful checks; failure or cancellation does not permit automerge. |
+| Release caller | Required permissions, environment protection, trusted-publishing configuration, and build hooks remain compatible. Inspect gates without publishing to prove a change. |
+
+Maintain input documentation alongside contract changes. Report YAML, schema, contract inspection, and CI execution as distinct evidence in the review matrix.
 
 ---
 

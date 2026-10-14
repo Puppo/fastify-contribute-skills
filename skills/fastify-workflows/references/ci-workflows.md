@@ -1,6 +1,6 @@
 # Reusable CI & Service Workflows in `fastify/workflows` (`ci-workflows`)
 
-Load this reference when reviewing or modifying `plugins-ci.yml`, `nested-quality.yml`, `plugins-ci-package-manager.yml`, or any of the 6 service-container CI workflows (`plugins-ci-redis.yml`, `plugins-ci-postgres.yml`, `plugins-ci-mysql.yml`, `plugins-ci-mongo.yml`, `plugins-ci-kafka.yml`, `plugins-ci-elasticsearch.yml`).
+Load this reference when reviewing or modifying `plugins-ci.yml`, `nested-quality.yml`, `plugins-ci-package-manager.yml`, or the service-container CI workflows (`plugins-ci-redis.yml`, `plugins-ci-postgres.yml`, `plugins-ci-mysql.yml`, `plugins-ci-mongo.yml`, `plugins-ci-kafka.yml`, `plugins-ci-elasticsearch.yml`).
 
 ---
 
@@ -26,7 +26,7 @@ All `plugins-ci*.yml` workflows (except `plugins-ci-package-manager.yml`, which 
 - `plugins-ci-postgres.yml`:
   - `postgresql-version` (`string`, `required: false`, default `'18'`): Docker image tag for `postgres:${{ inputs.postgresql-version }}-alpine`.
 
-> **Cross-File Update Rule:** Whenever you update the default `node-versions` array or upgrade `actions/checkout`, `actions/setup-node`, or `fastify/github-action-merge-dependabot`, check **all 8** `plugins-ci*.yml` files (plus `nested-quality.yml`) so no workflow drifts behind.
+> **Cross-File Update Rule:** Whenever you update the default `node-versions` array or upgrade `actions/checkout`, `actions/setup-node`, or `fastify/github-action-merge-dependabot`, check **all** `plugins-ci*.yml` files (plus `nested-quality.yml`) so no workflow drifts behind.
 
 ---
 

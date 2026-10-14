@@ -26,7 +26,7 @@ Use this skill whenever reviewing a pull request, commit range, or branch diff i
    - Never leave manual comments on indentation, semicolons, quotes, or import ordering that `neostandard` (`eslint`) or `biome` automatically checks—simply report whether `npm run lint` passes or fails.
 5. **Fastify Maintainer Tone:**
    - Be welcoming, direct, collaborative, and concise (*"Thanks for the PR!"*, *"Good catch!"*, *"Can we add a regression test for this edge case?"*).
-   - Provide concrete GitHub ````suggestion` blocks whenever a fix can be expressed in a few lines.
+   - Provide GitHub ````suggestion` blocks when a verified, self-contained replacement fits an exact changed line range; otherwise explain the required behavior or regression test.
 
 ---
 
@@ -62,13 +62,13 @@ Inspect the full diff (`gh pr diff` or `git diff <base>...HEAD`) against the dom
 ### Step 5: Classify Findings by Severity
 Group findings strictly into three levels (or zero findings if clean):
 - **`[Blocking]`**: Demonstrated bugs, regressions, missing tests needed for affected behavior or public types, broken contracts, security issues, unintended breaking changes, or confirmed repository-policy/check failures. Missing local prerequisites are a verification limitation, not proof that the PR fails.
-- **`[Suggestion]`**: Concrete improvements to performance, readability, test assertions, or idiomatic Fastify patterns that do not block correctness (include a ````suggestion` block).
+- **`[Suggestion]`**: Concrete improvements to performance, readability, test assertions, or idiomatic Fastify patterns that do not block correctness. Include a ````suggestion` block only when its replacement and line range are verified.
 - **`[Question]`**: Clarifying questions about design intent, edge cases, or semver expectations.
 
 ### Step 6: Produce the Standardized Review Output
 Read [references/tone-and-templates.md](references/tone-and-templates.md) and format the response using the canonical 4-part Fastify review template:
 1. **Verdict & Executive Summary** (`Approve (LGTM)` | `Request Changes` | `Comment`)
-2. **Inline Review Comments** (ordered by severity, with `file:line` and ````suggestion` blocks)
+2. **Inline Review Comments** (ordered by severity, with `file:line` and verified ````suggestion` blocks where applicable)
 3. **Verification & Area Matrix** (table of checked areas and commands run)
 4. **Ready-to-Post GitHub Review** (top-level summary + copy-pasteable inline comments in the Fastify maintainer voice).
 

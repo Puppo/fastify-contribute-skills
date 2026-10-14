@@ -80,6 +80,14 @@ For TypeScript-authored plugins/type providers like `@fastify/type-provider-type
 - `package.json#exports` defines separate `"import"` (`./dist/esm/index.d.mts` + `./dist/esm/index.mjs`) and `"require"` (`./dist/cjs/index.d.ts` + `./dist/cjs/index.js`) conditions.
 - Always run `npm run build` (which runs `attw --pack .` via `@arethetypeswrong/cli`) before running `npm run test:types` (`tstyche`) so `dist/` declarations are up to date and verified across module resolution modes.
 
+### Provider Inference Across Registration Scopes
+
+For type-provider changes, assert the inferred request/reply types inside an encapsulated plugin, using its provider generic or `withTypeProvider<...>()` as appropriate. Provider types do not propagate globally into every registration scope. Preserve schema literals where the provider requires them; test runtime validation/serialization separately because compile-time inference does not install a runtime compiler.
+
+For declaration augmentation, pair type assertions with a runtime scope test: an augmented `FastifyInstance` interface alone cannot establish decorator availability in a parent or sibling scope.
+
+Source checked on 2026-10-14: [Fastify Type Providers, revision e222f53](https://github.com/fastify/fastify/blob/e222f53aa267080b349eacdeaff03ea9a061e8c7/docs/Reference/Type-Providers.md). Use the target package's supported versions and tests.
+
 ---
 
 ## 3. Type Testing with TSTyche (`types/*.tst.ts`)

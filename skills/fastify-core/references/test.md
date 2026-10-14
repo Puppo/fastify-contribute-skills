@@ -97,8 +97,28 @@ Load this reference when writing, debugging, or reviewing runtime unit tests (`t
 1. **Bundler Tests (`test/bundler/webpack` & `test/bundler/esbuild`):**
    - Verifies that `fastify` can be bundled with Webpack and esbuild without breaking generated validators or dynamic requires (`ci.yml` `package` job):
      ```bash
-     cd test/bundler/webpack && npm install --ignore-scripts && npm test
-     cd test/bundler/esbuild && npm install --ignore-scripts && npm test
+     (cd test/bundler/webpack && npm install --ignore-scripts && npm test)
+     (cd test/bundler/esbuild && npm install --ignore-scripts && npm test)
      ```
 2. **Production Smoke Test (`integration/`):**
    - `integration/server.js` and `integration/test.sh` verify that Fastify starts and serves routes when installed with production-only dependencies (`pnpm install --ignore-scripts --prod`).
+
+Run both bundler commands from the repository root; the subshells preserve that working directory. During review, execute install/build checks in the isolated checkout when they can modify tracked files.
+
+---
+
+## 4. Regression Scenarios for Lifecycle & Scope Changes
+
+Select scenarios for the affected contract rather than adding this entire matrix to every PR:
+
+| Changed behavior | Regression evidence |
+| --- | --- |
+| Early reply from a hook | Assert the response and that subsequent hooks/handler do not execute; cover callback or async style as affected. |
+| Error propagation | Assert which scoped error handler receives the error and that a response is sent once; verify `onError` side effects without sending from that hook. |
+| Response transformations | Exercise object payloads and relevant string/Buffer/stream/null cases to distinguish `preSerialization` from `onSend`. |
+| Encapsulation | Check parent-to-child inheritance and child/sibling isolation for affected decorators, hooks, schemas, or error handlers. Include the intentional shared behavior of `fastify-plugin` where relevant. |
+| Per-instance or per-request state | Run two instances/registrations with different options and concurrent requests where relevant; assert no shared mutable state. |
+| Validator/serializer changes | Test the result contract, error paths, and response schema selection described in [best-practices.md](best-practices.md). |
+| Type-provider changes | Add type assertions in the actual plugin scope; verify provider inference and runtime schema behavior separately. |
+
+Use existing tests and public behavior as the oracle. A focused regression should fail without the fix and pass with it; retain the repository's configured coverage gates.

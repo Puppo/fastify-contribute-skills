@@ -6,13 +6,13 @@ Load this reference when inspecting, debugging, or modifying `.github/workflows/
 
 ## 1. Overview of `fastify/fastify` Workflows (`.github/workflows/`)
 
-Unlike individual plugin repositories that delegate all CI to `plugins-ci.yml`, `fastify/fastify` maintains 20 specialized workflows in `.github/workflows/`:
+Fastify core maintains its own CI and maintenance workflows. The table below maps workflow domains from the repository audit; inspect `.github/workflows/` in the target checkout for current names, triggers, and defaults:
 
 | Category | Workflow File(s) | Purpose |
 | --- | --- | --- |
 | **Primary CI & Coverage** | `ci.yml`, `coverage-nix.yml`, `coverage-win.yml` | Quality check (`nested-quality.yml`), 100% coverage gate on Linux & Windows, multi-OS/Node unit test matrix, `test-types`, Pino `^9`/`^10` compatibility, Webpack/esbuild bundler tests, and Dependabot automerge. |
 | **Alternative Runtimes & Package Managers** | `ci-alternative-runtime.yml`, `integration.yml`, `integration-alternative-runtimes.yml`, `package-manager-ci.yml` | Tests Fastify on NodeSource N\|Solid runtime, production-only installs (`integration/test.sh`), and `pnpm` (v10, v11) + `yarn`. |
-| **Ecosystem Canary (CITGM) & Regression** | `citgm.yml`, `citgm-package.yml`, `test-compare.yml` | Runs the test suites of 50+ official `@fastify/*` core plugins against the PR branch (`citgm-core-plugins` label), or runs base-vs-PR regression comparison (`test-compare` label). |
+| **Ecosystem Canary (CITGM) & Regression** | `citgm.yml`, `citgm-package.yml`, `test-compare.yml` | Runs the test suites of official `@fastify/*` core plugins against the PR branch (`citgm-core-plugins` label), or runs base-vs-PR regression comparison (`test-compare` label). |
 | **Documentation & Ecosystem Links** | `md-lint.yml`, `links-check.yml`, `lint-ecosystem-order.yml`, `validate-ecosystem-links.yml`, `website.yml` | Lints markdown (`markdownlint-cli2`), checks internal/external links (`lychee` + `linkinator`), enforces alphabetical order and live repo status in `docs/Guides/Ecosystem.md`, and triggers `fastify/website` deploys. |
 | **PR Governance & Maintenance** | `pull-request-title.yml`, `missing_types.yml`, `backport.yml`, `labeler.yml`, `lock-threads.yml` | Enforces Conventional Commit PR titles, opens follow-up issues when PRs labeled `missing-types` merge, auto-backports merged PRs labeled `backport*`, labels PRs, and locks stale threads. |
 
@@ -49,7 +49,7 @@ Unlike individual plugin repositories that delegate all CI to `plugins-ci.yml`, 
 Maintainers can trigger specialized workflows on pull requests by applying labels:
 
 1. **`citgm-core-plugins` Label -> `citgm.yml` & `citgm-package.yml`:**
-   - Runs the test suites of 50+ official `@fastify/*` ecosystem plugins by linking the Fastify PR checkout (`npm link` -> `npm link fastify` -> `npm test` in each plugin repo).
+   - Runs the test suites of official `@fastify/*` ecosystem plugins by linking the Fastify PR checkout (`npm link` -> `npm link fastify` -> `npm test` in each plugin repo).
    - After completion, the `remove-label` job automatically removes the `citgm-core-plugins` label from the PR.
 2. **`test-compare` Label -> `test-compare.yml`:**
    - Runs `nearform-actions/github-action-test-compare` with `testCommand: 'npm run test:ci'` to verify that a new test fails on the base branch and passes on the PR branch.

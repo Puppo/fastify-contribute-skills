@@ -115,3 +115,19 @@ Choose the smallest, fastest test boundary that accurately tests the plugin's be
    - If a test writes uploaded files to disk (`@fastify/multipart`) or installs `@sinonjs/fake-timers` / `sinon.spy`, restore clocks and `unlink` temporary files inside `t.after()`.
 4. **Honest Reporting When Docker Services Are Offline:**
    - If working in an environment without Docker or a running Redis/Postgres/Mongo/MySQL/Kafka/Elasticsearch instance, run `npm run lint` and `npm run test:typescript` (`tstyche`), and explicitly report which service-dependent runtime tests could not execute locally.
+
+---
+
+## 5. Regression Scenarios for Registered Plugins
+
+Choose scenarios that exercise the changed public behavior:
+
+- **Scope:** Check decorator/hook/schema/error-handler visibility in the parent, child, and sibling scopes. Test the package's intended encapsulation or sharing instead of assuming every plugin is global.
+- **Independent registrations:** Register with different options in separate scopes or instances, where supported, and assert that configuration and mutable request state do not leak. If duplicate registration is intentionally rejected, test that documented error instead.
+- **Early replies and errors:** Assert an authorization/rejection response prevents subsequent hooks and handlers from running. Test scoped error handling and a single response; do not send replies from `onError`.
+- **Payload transformations:** Cover the relevant object, string, Buffer, stream, or null cases according to [code.md](code.md). Verify response-field exposure when schemas or serializers change.
+- **Resource ownership:** Verify plugin-created resources close and externally supplied clients remain usable unless the documented ownership option says otherwise. Exercise failure during initialization when cleanup behavior changes.
+
+Standalone utilities use equivalent isolation/error tests through their exported API. These scenarios do not require introducing a Fastify wrapper or a new test runner.
+
+Topic coverage was informed by [TheCodePace's encapsulation guide at revision `374e800`](https://github.com/TheCodePace/fastify-skills/blob/374e800d6198b582157f27f6b89593acecc51a63/skills/fastify-best-practise/rules/encapsulation.md), inspected on 2026-10-14. Its application examples are not maintainer policy; verify adapted examples against the official contracts in [code.md](code.md) and the package's tests.
