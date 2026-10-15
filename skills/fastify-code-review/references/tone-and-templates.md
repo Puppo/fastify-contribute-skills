@@ -1,150 +1,74 @@
-# Fastify Maintainer Tone & Standardized Review Templates
+# Fastify Maintainer Tone & Review Templates
 
-Reference for the Fastify maintainer voice, severity tags, GitHub ````suggestion` blocks, and standardized PR review output templates.
+Reference for concise maintainer comments, severity tags, verified GitHub suggestion blocks, and review output.
 
-## 1. The Fastify Maintainer Tone Guide
+## 1. Fastify Maintainer Tone
 
-Use a welcoming, concise, collaborative voice across Fastify reviews:
+- Be welcoming, direct, and collaborative. A brief thanks at the start is enough; do not repeat praise in every finding.
+- Write short sentences. State the concrete impact and requested change once; skip AI preambles and file-by-file summaries.
+- Prefer “Can we add a regression test for this case?” over “You failed to test this.” Explain why in one sentence.
+- Use GitHub ````suggestion` blocks only for verified, self-contained replacements mapped to exact changed line ranges. Otherwise describe the required behavior or test.
+- Avoid formatting nitpicks covered by the repository's linter, unrelated refactors, and hypothetical cases that cannot occur under the actual lifecycle or schema.
 
-### Core Voice Principles
-1. **Welcoming & Appreciative First:**
-   - Open reviews warmly: *"Thanks for opening this PR!"*, *"Good catch!"*, *"Thanks for working on this!"*.
-   - Even when requesting changes or closing/redirecting a PR, acknowledge the contributor's effort.
-2. **Concise, Direct, and High-Signal:**
-   - Write short, direct sentences. Avoid verbose AI preambles, generic praise paragraphs, or restating what every file in the PR does.
-   - If the PR is good to merge, a simple **`LGTM`** (or *"Thanks for the PR! LGTM 🚀"*) is preferred over a multi-paragraph essay.
-3. **Collaborative ("We" / Questions) Instead of Prescriptive:**
-   - Prefer *"Can we add a regression test for this case?"* or *"What happens if `reply.sent` is already true here?"* over *"You failed to test this"* or *"You must change this"*.
-   - Explain the **why** in one sentence (e.g., *"We initialize all properties in the `Request` constructor to preserve V8's monomorphic hidden class."*).
-4. **Actionable via GitHub ````suggestion` Blocks:**
-   - Include a GitHub ````suggestion` block when the replacement is verified, self-contained, and maps to an exact changed line range. Use explanation or a requested regression test when a safe replacement is not established; short fixes do not automatically require a suggestion.
-5. **What Never to Say or Flag:**
-   - Never nitpick formatting, semicolons, quotes, or spacing covered by `neostandard` / `biome`.
-   - Never ask contributors to refactor unrelated code outside their diff.
-   - Never invent hypothetical edge cases that cannot occur given Fastify's lifecycle or schema validation.
+## 2. Compact Review Output
 
----
-
-## 2. Standardized 4-Part Review Output Template
-
-Use this 4-part structure for the local review report so maintainers get a predictable, scannable result. The ready-to-post summary can remain a concise `LGTM` when clean. Omit suggestion blocks unless the replacement and line range are verified:
-
-````markdown
-## 1. Review Verdict: `<Approve (LGTM) | Request Changes | Comment>`
-
-**Summary:** <1–2 concise sentences stating whether the PR is ready to merge or what key items need attention.>
-
----
-
-## 2. Inline Findings
-
-> If there are no findings, write: `No blocking or non-blocking issues found.`
-
-### `[Blocking]` `<path/to/file>:<line>` — <Short Title>
-**Why:** <1–2 sentences explaining the bug, missing test/type, or policy violation.>
-**Comment to post:**
-> <Maintainer-toned comment ready for GitHub>
-> ```suggestion
-> <exact replacement code if applicable>
-> ```
-
-### `[Suggestion]` `<path/to/file>:<line>` — <Short Title>
-**Why:** <1 sentence explaining the improvement.>
-**Comment to post:**
-> <Maintainer-toned comment ready for GitHub>
-> ```suggestion
-> <exact replacement code if applicable>
-> ```
-
-### `[Question]` `<path/to/file>:<line>` — <Short Title>
-**Comment to post:**
-> <Maintainer-toned question ready for GitHub>
-
----
-
-## 3. Verification & Checklist Matrix
-
-**Review scope:** `<repository / PR URL or local range>`
-**Reviewed revisions:** base `<SHA>`, head `<SHA>`
-**Local verification revision:** `<SHA and clean/isolated checkout; include patch scope for an explicit working-tree review, or Not run with reason>`
-
-| Area | Status | Evidence / Commands and Exit Codes |
-|------|--------|-----------------------------------|
-| **PR Governance & Title** | `Pass / Fail / Not run / N/A` | `<confirmed repository policy and applicable PR category>` |
-| **Runtime & Architecture** | `Pass / Fail / Not run / N/A` | `<source inspected at reviewed head>` |
-| **TypeScript & declarations** | `Pass / Fail / Not run / N/A` | `<public contract checked, or no public type change>` |
-| **Local Unit / Integration Tests** | `Pass / Fail / Not run / N/A` | `<exact command, exit code, missing services if applicable>` |
-| **Local Coverage Gate** | `Pass / Fail / Not run / N/A` | `<coverage command, exit code, actual metrics and thresholds>` |
-| **Local Type Tests** | `Pass / Fail / Not run / N/A` | `<configured runner command and exit code>` |
-| **Docs & Workflows** | `Pass / Fail / Not run / N/A` | `<checks relevant to the changed files>` |
-| **Remote CI** | `Pass / Fail / Pending / Not run / N/A` | `<run links, checked SHA, head or merge commit, observed status>` |
-
-Use `Not run` for applicable checks lacking execution/evidence and `N/A` only for checks outside the change's scope. Unit-test success alone is not coverage evidence. Identify environment failures separately from demonstrated PR failures. Preserve material verification limitations in the summary, including an unavailable matching checkout; use `Comment` when those limitations prevent a supported approval.
-
----
-
-## 4. Ready-to-Post GitHub Review Summary
+Default to a verdict, findings only when present, and brief verification evidence. Write findings directly as ready-to-post comments, ordered `[Blocking]`, `[Suggestion]`, then `[Question]`. Do not repeat them in a separate summary or add empty sections. Expand into a detailed report or checklist matrix only when requested.
 
 ```markdown
-<Copy-pasteable top-level GitHub review comment written in the Fastify maintainer voice>
-```
-````
+<Request Changes | Comment | Approve (LGTM)> — <brief reason if needed>
 
----
+[Blocking] <file:line> — <concrete impact>. <requested change>
 
-## 3. Canonical Maintainer Comment Examples by Scenario
-
-Use these templates to keep the tone consistent across common Fastify PR situations:
-
-### Scenario A: Clean PR (`Approve / LGTM`)
-```markdown
-Thanks for the PR! LGTM 🚀
+Verification: <repository / PR URL or range>; base <SHA>, head <SHA>.
+Local: <tested SHA; clean/isolated checkout or working-tree patch scope>; <exact commands and exit codes>.
+Coverage: <command, exit code, metrics and thresholds, or Not run with reason>.
+Remote CI: <run link, checked SHA, head/merge revision, status, or Not run with reason>.
 ```
 
-### Scenario B: Bug Fix Missing a Regression Test (`Request Changes`)
-```markdown
-Thanks for tracking this down!
+Include only relevant verification categories and combine short entries when useful. Keep applicable but unavailable checks visible as `Not run` with a reason; omit categories outside the change's scope. Distinguish local tests, type tests, coverage gates, and remote CI. Unit-test success alone is not coverage evidence.
 
-Can we add a regression test in `test/<file>.test.js` that reproduces the issue and fails without this fix? We want to make sure we don't regress on this behavior in future releases and preserve the repository's configured coverage requirements.
-```
+Put material verification limitations in the verdict, including an unavailable matching checkout. Environment failures are not demonstrated PR failures; use `Comment` when limitations prevent a supported approval. Preserve the read-only review and posting-authorization rules in the companion workflow.
 
-### Scenario C: Runtime Option Added Without `.d.ts` & Type Tests (`Request Changes`)
-```markdown
-Thanks for adding this option!
+### Clean Review Example
 
-Since this changes the public plugin options, could you also:
-1. Add `<optionName>?: <type>` to `types/index.d.ts`
-2. Add a type test in `types/index.tst.ts` (and run `npm run test:typescript`)
-3. Document the new option in `README.md`?
-```
-
-### Scenario D: Ordinary PR Violates a Confirmed Version or Lockfile Policy (`Request Changes`)
-
-Use only the applicable comment after checking repository policy. Do not use the version comment for documented release PRs, or the lockfile comment for repositories that track lockfiles, including the website.
+Illustrative values below must be replaced with actual evidence:
 
 ```markdown
-Thanks for the PR! Could you revert the version change in `package.json`? This repository's contribution policy reserves version bumps for its release process, and this PR is an ordinary bug fix.
+Approve (LGTM). Thanks for the PR!
+
+Verification: fastify/example-plugin PR #42; base <SHA>, head <SHA>.
+Local at <head SHA>, isolated checkout: `npm run test:unit`, `npm run test:typescript`, `npm run lint` — exit 0 each.
+Coverage: <configured command> — exit 0; <actual metrics / thresholds>.
+Remote CI: <run link> at <head SHA> — passed.
 ```
+
+### One Finding with a Verification Limitation
 
 ```markdown
-Thanks for the PR! Could you remove the newly added `package-lock.json`? This repository's contribution rules and existing tracked files exclude that lockfile.
+Request Changes — the fix needs regression coverage.
+
+[Blocking] test/example.test.js:24 — This test also passes without the fix. Can we add the failing-input case to protect against regression?
+
+Verification: fastify/example-plugin PR #42; base <SHA>, head <SHA>.
+Local at <head SHA>, isolated checkout: `npm run test:unit` — exit 0.
+Coverage: Not run — required service unavailable.
+Remote CI: <run link> at <head SHA> — pending.
 ```
 
-### Scenario E: V8 Shape / Hot-Path Allocation in `fastify/fastify` (`Request Changes`)
-```markdown
-Good catch on the state tracking. Instead of assigning `request.<prop>` dynamically inside the hook, can we initialize `this[k<Prop>] = null` in the `Request` constructor in `lib/request.js` (using a symbol from `lib/symbols.js`)? That keeps the `Request` hidden class monomorphic (`test/same-shape.test.js`).
-```
+## 3. Maintainer Comment Examples
 
-### Scenario F: PR Title Failing `fastify/action-pr-title` (`Comment` / `Request Changes`)
+Use these as short comment patterns, with actual diff locations and repository evidence. The review's opening thanks need not be repeated.
 
-Use only when this repository configures that check and the actual title violates its rules.
-```markdown
-Thanks for the PR! Could you update the PR title to follow Conventional Commits (for example, `fix: handle empty payload in onSend hook`) so the `PR Title` check passes?
-```
+| Scenario | Comment |
+| --- | --- |
+| Bug fix missing a regression test | Can we add a test that fails without this fix? |
+| Public option missing types and docs | Can we add this option to the public declarations, cover it in a type test, and document it? |
+| Ordinary PR violates confirmed version policy | Could you revert the version bump? This repository reserves it for the release process. |
+| Newly added lockfile violates confirmed policy | Could you remove the new lockfile? This repository's contribution rules exclude it. |
+| Request property added dynamically | Can we initialize this property in the `Request` constructor using the repository's symbol convention? That preserves its monomorphic shape. |
+| PR title fails the configured check | Could you update the title to match this repository's title check? |
+| Website PR edits fetched docs | Could you open this change against `fastify/fastify/docs/`? The website fetches these files from there. |
+| Proposed core feature fits a plugin | Can we implement this through the existing hook in a plugin? That keeps core minimal. |
+| RFC interpretation is unresolved | Which revision of the linked RFC does this target? The newer proposal changes this requirement. |
 
-### Scenario G: Docs or Ecosystem Edit Opened Against `fastify/website` Instead of `fastify/fastify` (`Request Changes`)
-```markdown
-Thanks for spotting this! The documentation and `Ecosystem.md` files in `fastify/website` are fetched automatically at build time from the [`fastify/fastify`](https://github.com/fastify/fastify) repository (`docs/`).
-
-Could you please open this PR against [`fastify/fastify`](https://github.com/fastify/fastify/tree/main/docs) instead? Once merged there, it will automatically be picked up by the website build.
-```
+Apply policy comments only after confirming local rules. Version comments do not apply to documented release PRs; lockfile comments do not apply where the file is tracked by policy.

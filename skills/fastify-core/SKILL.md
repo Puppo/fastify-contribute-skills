@@ -17,6 +17,8 @@ Use this skill when reviewing a pull request, implementing a feature, or fixing 
 
 Repository maps, tool versions, and workflow defaults below are orientation examples. Confirm them in the target checkout before applying them; its configuration and contribution rules determine applicability. Source root observed on 2026-10-14: [fastify/fastify at `e222f53`](https://github.com/fastify/fastify/tree/e222f53aa267080b349eacdeaff03ea9a061e8c7).
 
+Keep core minimal: anything that can be implemented as a plugin should be a plugin. For new core behavior, assess existing hooks, decorators, and other extension points first; require a concrete reason for core placement. Ask when plugin feasibility or the rationale is unclear.
+
 ## Step 1: Verify Target Branch, Governance & Local Scripts
 
 1. **Branch & Version Line Check:**

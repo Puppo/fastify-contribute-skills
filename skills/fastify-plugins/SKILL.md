@@ -13,7 +13,7 @@ Use this skill when creating, structuring, reviewing, or maintaining **Fastify e
 > - For the centralized reusable workflows repository ([`fastify/workflows`](https://github.com/fastify/workflows)), use [`fastify-workflows`](../fastify-workflows/SKILL.md).
 > - For the official Fastify website repository ([`fastify/website`](https://github.com/fastify/website)), use [`fastify-website`](../fastify-website/SKILL.md).
 
-Repository maps, dependency versions, and workflow defaults below are examples; confirm them in the target checkout. Blueprint source root observed on 2026-10-14: [fastify/skeleton at `faa3f75`](https://github.com/fastify/skeleton/tree/faa3f75d001739c9f1fae00dd20aab1175341898). Official documentation for the supported Fastify version and package tests determine behavior.
+Dependency versions and workflow defaults below are examples; confirm them in the target checkout. Blueprint source root observed on 2026-10-14: [fastify/skeleton at `faa3f75`](https://github.com/fastify/skeleton/tree/faa3f75d001739c9f1fae00dd20aab1175341898). Official documentation for the supported Fastify version and package tests determine behavior.
 
 ## Step 1: Classify the Package & Inspect Local Configuration
 
@@ -30,38 +30,9 @@ Repository maps, dependency versions, and workflow defaults below are examples; 
 
 ---
 
-## How Fastify Plugin Repositories Are Made & Structured
+For new registered plugins, use [`fastify/skeleton`](https://github.com/fastify/skeleton) as a starting point. For existing packages, follow their repository structure and tooling.
 
-The [`fastify/skeleton`](https://github.com/fastify/skeleton) blueprint illustrates a common plugin layout. Use it for applicable new plugins; preserve an existing package's supported structure and tooling:
-
-```text
-.
-├── .editorconfig                   # 2-space indent, LF line endings, UTF-8
-├── .gitattributes                  # text=auto
-├── .gitignore                      # Ignores node_modules/, coverage/, .nyc_output/
-├── .npmrc                          # ignore-scripts=true, min-release-age=7, package-lock=false
-├── .borp.yaml                      # Optional: when using borp instead of c8 + node --test
-├── .github/
-│   ├── dependabot.yml              # Weekly npm & github-actions updates with 7-day cooldown
-│   └── workflows/
-│       ├── ci.yml                  # Caller workflow -> fastify/workflows plugins-ci*.yml@<sha>
-│       ├── lock-threads.yml        # Caller workflow -> fastify/workflows lock-threads.yml@<sha>
-│       ├── package-manager-ci.yml  # Optional caller -> plugins-ci-package-manager.yml@<sha>
-│       └── release.yml             # Caller workflow -> fastify/workflows reusable-release.yml@<sha>
-├── docs/                           # Optional extended documentation
-├── examples/                       # Runnable usage examples
-├── eslint.config.js                # neostandard({ ignores: resolveIgnoresFromGitignore(), ts: true })
-├── index.js                        # Main plugin entry wrapped with fastify-plugin (fp)
-├── lib/                            # Internal helpers, symbols, errors, or sub-modules
-├── package.json                    # CommonJS default, types: "types/index.d.ts", 100% test coverage
-├── LICENSE                         # MIT License
-├── README.md                       # Install, usage, options table, acknowledgments, MIT license
-├── test/
-│   └── *.test.js                   # node:test suites (100% coverage via c8 --100 or borp -C)
-└── types/
-    ├── index.d.ts                  # Manual TS declarations + declare module 'fastify' augmentation
-    └── index.tst.ts                # TSTyche type tests (imports, options, decorators, negative tests)
-```
+When a PR or task links or includes protocol or project RFCs, read them and relevant discussion before implementation or review. Follow the shared [RFC currency and adherence procedure](../fastify-code-review/references/review-flow-and-checklists.md#rfc-currency-and-adherence) to establish the applicable revision and check affected behavior, types, tests, and docs.
 
 ---
 
