@@ -116,16 +116,22 @@ Configured in `astro.config.mjs` for both Markdown and MDX:
 
 ## 7. Project-Embedded UI/UX Skills (`frontend-design` & `web-design-guidelines`)
 
-`fastify/website` checks in two dedicated Agent Skills under `.agents/skills/` (with symlinks in `.claude/skills/` and hashes locked in `skills-lock.json`):
+`fastify/website` checks in dedicated Agent Skills under [`.agents/skills/`](https://github.com/fastify/website/tree/main/.agents/skills) (with symlinks in `.claude/skills/` and hashes locked in [`skills-lock.json`](https://github.com/fastify/website/blob/main/skills-lock.json)).
 
-1. **`frontend-design` (`.agents/skills/frontend-design/SKILL.md` — `anthropics/skills`)**:
+### Dynamic Discovery & Remote Review Lookup
+- **In a local `fastify/website` checkout**: Always inspect `skills-lock.json` and list `.agents/skills/*/SKILL.md` so you load both the existing skills below and any newly added repository skills.
+- **When reviewing a `fastify/website` PR from outside a local checkout**: Inspect `skills-lock.json` and `.agents/skills/` via `gh api repos/fastify/website/contents/.agents/skills` (or read `https://raw.githubusercontent.com/fastify/website/main/.agents/skills/<skill-name>/SKILL.md`) so the repository's embedded skills are still applied during remote review.
+
+### Embedded Skills Reference
+
+1. **[`frontend-design`](https://github.com/fastify/website/blob/main/.agents/skills/frontend-design/SKILL.md) (`.agents/skills/frontend-design/SKILL.md` — upstream: [`anthropics/skills`](https://github.com/anthropics/skills))**:
    - **When to Load**: Whenever creating new UI sections, redesigning pages/components, adjusting visual hierarchy, or authoring interface copy.
    - **Core Directives Applied to `fastify/website`**:
      - Ground visual choices in Fastify's domain (high-throughput, low-overhead Node.js telemetry and velocity: `.bg-telemetry`, `.glow-amber`, `.eyebrow`, `VelocityMeter.astro`, `BenchBars.astro`).
      - Maintain the 3-role typography system (`--font-display` Space Grotesk for headings, `--font-sans` Inter for prose/body, `--font-mono` JetBrains Mono for metrics, eyebrows, tags, and code).
      - Use structural devices (eyebrows like `// benchmarks`, `[tier 04]` markers, dividers) only where they encode real hierarchy or sequence.
      - Exercise restraint: keep surfaces disciplined (`--surface`, `--border`), respect `prefers-reduced-motion: reduce`, ensure visible keyboard `:focus-visible`, and write concise, active-voice, user-centered copy.
-2. **`web-design-guidelines` (`.agents/skills/web-design-guidelines/SKILL.md` — `vercel-labs/agent-skills`)**:
+2. **[`web-design-guidelines`](https://github.com/fastify/website/blob/main/.agents/skills/web-design-guidelines/SKILL.md) (`.agents/skills/web-design-guidelines/SKILL.md` — upstream: [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills))**:
    - **When to Load**: Whenever reviewing UI pull requests, auditing accessibility, or checking `.astro` components against UX best practices.
    - **How It Works**:
      - Fetches the latest rules from `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`, checks the modified `.astro`/`.ts`/`.css` files against all rules (semantic HTML, keyboard navigation, focus states, responsive layout, form/input labels, loading/empty/error states), and reports findings in `file:line` format.
