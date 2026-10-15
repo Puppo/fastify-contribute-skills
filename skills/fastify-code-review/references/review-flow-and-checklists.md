@@ -59,6 +59,16 @@ Read contribution rules, `package.json`, `.npmrc`, ignore rules, tracked files, 
 | **Dependencies and install policy** | Assess new dependencies and changes to install protections against documented requirements and concrete risks. Report confirmed security regressions; ask when an exception's rationale is missing. |
 | **Coverage** | Read configured metrics and thresholds in package scripts, runner config, and CI. Report unit results and coverage checks separately; do not infer branch/function coverage from a line-only gate. |
 
+### RFC Currency and Adherence
+
+Apply when the PR or task links or includes protocol standards or project design RFCs:
+
+1. **Read the source and discussion.** Read the RFC itself, included copies, and relevant PR discussion or linked decisions; a PR summary is insufficient. For GitHub PRs, inspect comments as well as the body.
+2. **Check currency at the authoritative source.** For protocol RFCs, check status, updates, obsoleting documents, and relevant errata. For project RFCs, check revision history, superseding proposals, acceptance status, and agreed amendments.
+3. **Establish the applicable revision.** Record its link/version and why it applies to this change. A newer draft does not automatically supersede an accepted proposal or a deliberately targeted protocol version. Resolve material ambiguity as a question before claiming compliance.
+4. **Check the relevant facets.** Compare affected runtime behavior, public types, tests, and documentation against applicable requirements, including normative strength, conditions, exceptions, optional behavior, and compatibility considerations. Check both normal and failure paths where required; do not treat optional behavior as mandatory.
+5. **Report with evidence.** Cite the applicable RFC section alongside the changed `file:line` and explain any demonstrated violation. Use `[Question]` for unresolved interpretation or target-version ambiguity. If a source is inaccessible, disclose the limitation and do not claim RFC compliance.
+
 ---
 
 ## 3. Repository-Specific Technical Review Checklists
@@ -66,6 +76,7 @@ Read contribution rules, `package.json`, `.npmrc`, ignore rules, tracked files, 
 Pair with the matching repository skill and apply only checks relevant to the changed behavior. Confirm commands and paths in the target checkout before executing examples below.
 
 ### A. `fastify/fastify` Core (with `fastify-core`)
+- [ ] **Keep Core Minimal**: Anything that can be implemented as a plugin should be a plugin. Do existing extension points support the proposed behavior? Require a concrete reason for core placement; use `[Question]` when feasibility or rationale is unclear.
 - [ ] **V8 Monomorphic Shapes**: Does `Request` (`lib/request.js`) or `Reply` (`lib/reply.js`) initialize all properties in the constructor (`null`/`undefined`), avoiding dynamic property addition/deletion? (`test/same-shape.test.js`)
 - [ ] **Hot-Path Discipline**: Are per-request closures, unnecessary `async/await` wrappers, or `Object.assign` allocations avoided in `lib/handle-request.js`, `lib/hooks.js`, `lib/Reply`, and `lib/Request`?
 - [ ] **Precompiled Standalone Artifacts**: If `build/build-validation.js` or `build/build-error-serializer.js` changed, do committed generated files match their sources? Confirm `build:validation` and `test:validator:integrity` in `package.json`; run the integrity script only in the isolated checkout described above.

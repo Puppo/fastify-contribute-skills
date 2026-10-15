@@ -26,6 +26,7 @@ Use this skill whenever reviewing a pull request, commit range, or branch diff i
    - Never leave manual comments on indentation, semicolons, quotes, or import ordering that `neostandard` (`eslint`) or `biome` automatically checks—simply report whether `npm run lint` passes or fails.
 5. **Fastify Maintainer Tone:**
    - Be welcoming, direct, collaborative, and concise (*"Thanks for the PR!"*, *"Good catch!"*, *"Can we add a regression test for this edge case?"*).
+   - Default to a compact verdict, actionable findings, and brief verification evidence. Omit empty sections and repeated summaries; expand only when requested.
    - Provide GitHub ````suggestion` blocks when a verified, self-contained replacement fits an exact changed line range; otherwise explain the required behavior or regression test.
 
 ---
@@ -42,6 +43,7 @@ Follow these 6 steps in order on every PR:
 Read [references/review-flow-and-checklists.md](references/review-flow-and-checklists.md). Establish policy from the target checkout's contribution rules, package scripts, ignore rules, tracked files, and workflows; compare the base when the PR changes those rules.
 - **Title, Branch & Version**: Apply the repository's actual requirements. Distinguish ordinary contributions from documented release PRs, where version bumps can be expected.
 - **Artifact & Lockfile Hygiene**: Reject unintended generated output according to repository evidence. Core's `build/` sources and generated validators are maintained files; the website's tracked lockfile is valid.
+- **RFC Context**: Read linked or included RFCs and relevant PR discussion. Follow the [RFC currency and adherence procedure](references/review-flow-and-checklists.md#rfc-currency-and-adherence) before assessing compliance.
 - **Policy Uncertainty**: Ask a question when a material rule cannot be confirmed; do not turn a convention in this skill into an unsupported blocker.
 
 ### Step 3: Audit the Diff Across All Affected Areas
@@ -66,11 +68,13 @@ Group findings strictly into three levels (or zero findings if clean):
 - **`[Question]`**: Clarifying questions about design intent, edge cases, or semver expectations.
 
 ### Step 6: Produce the Standardized Review Output
-Read [references/tone-and-templates.md](references/tone-and-templates.md) and format the response using the canonical 4-part Fastify review template:
-1. **Verdict & Executive Summary** (`Approve (LGTM)` | `Request Changes` | `Comment`)
-2. **Inline Review Comments** (ordered by severity, with `file:line` and verified ````suggestion` blocks where applicable)
-3. **Verification & Area Matrix** (table of checked areas and commands run)
-4. **Ready-to-Post GitHub Review** (top-level summary + copy-pasteable inline comments in the Fastify maintainer voice).
+Read [references/tone-and-templates.md](references/tone-and-templates.md). Default to:
+
+1. **Verdict** (`Approve (LGTM)` | `Request Changes` | `Comment`) with a short reason when needed.
+2. **Findings**, only when present: ordered by severity, with `file:line`, concrete impact, and the requested change. Write each once as a ready-to-post comment; add verified ````suggestion` blocks where applicable.
+3. **Brief verification evidence**: repository/range, reviewed base/head, tested revision, exact commands and exit codes, and material limitations. Distinguish local tests, coverage, and remote CI.
+
+Omit empty sections and duplicated summaries. Provide a detailed report or checklist matrix only when requested.
 
 ---
 

@@ -59,7 +59,7 @@ Select scenarios affected by the workflow change; use static inspection when exe
 | Optional integration job | An intentional skip does not block successful checks; failure or cancellation does not permit automerge. |
 | Release caller | Required permissions, environment protection, trusted-publishing configuration, and build hooks remain compatible. Inspect gates without publishing to prove a change. |
 
-Maintain input documentation alongside contract changes. Report YAML, schema, contract inspection, and CI execution as distinct evidence in the review matrix.
+Maintain input documentation alongside contract changes. Report YAML, schema, contract inspection, and CI execution as distinct verification evidence in the review.
 
 ---
 
